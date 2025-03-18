@@ -1,9 +1,9 @@
 package com.group02.mindmingle.config;
 
-import com.group02.mindmingle.feature.auth.Role;
-import com.group02.mindmingle.feature.auth.RoleRepository;
-import com.group02.mindmingle.feature.user.User;
-import com.group02.mindmingle.feature.user.UserRepository;
+import com.group02.mindmingle.feature.auth.entity.Role;
+import com.group02.mindmingle.feature.auth.repository.RoleRepository;
+import com.group02.mindmingle.feature.user.entity.User;
+import com.group02.mindmingle.feature.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Lazy;

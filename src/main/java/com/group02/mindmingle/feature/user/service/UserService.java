@@ -1,7 +1,9 @@
-package com.group02.mindmingle.feature.user;
+package com.group02.mindmingle.feature.user.service;
 
-import com.group02.mindmingle.feature.auth.Role;
-import com.group02.mindmingle.feature.auth.RoleRepository;
+import com.group02.mindmingle.feature.auth.entity.Role;
+import com.group02.mindmingle.feature.auth.repository.RoleRepository;
+import com.group02.mindmingle.feature.user.entity.User;
+import com.group02.mindmingle.feature.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.UserDetails;

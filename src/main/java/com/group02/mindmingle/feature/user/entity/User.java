@@ -1,6 +1,6 @@
-package com.group02.mindmingle.feature.user;
+package com.group02.mindmingle.feature.user.entity;
 
-import com.group02.mindmingle.feature.auth.Role;
+import com.group02.mindmingle.feature.auth.entity.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
