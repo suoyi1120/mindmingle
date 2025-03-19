@@ -1,4 +1,4 @@
-package com.group02.mindmingle.feature.auth.entity;
+package com.group02.mindmingle.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

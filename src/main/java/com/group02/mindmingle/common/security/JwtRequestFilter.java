@@ -1,6 +1,6 @@
 package com.group02.mindmingle.common.security;
 
-import com.group02.mindmingle.feature.user.service.UserService;
+import com.group02.mindmingle.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;

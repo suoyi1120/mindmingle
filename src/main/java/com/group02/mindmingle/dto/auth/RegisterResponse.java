@@ -1,4 +1,4 @@
-package com.group02.mindmingle.feature.auth.dto;
+package com.group02.mindmingle.dto.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

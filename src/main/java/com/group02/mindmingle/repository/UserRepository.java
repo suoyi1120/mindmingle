@@ -1,6 +1,6 @@
-package com.group02.mindmingle.feature.user.repository;
+package com.group02.mindmingle.repository;
 
-import com.group02.mindmingle.feature.user.entity.User;
+import com.group02.mindmingle.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

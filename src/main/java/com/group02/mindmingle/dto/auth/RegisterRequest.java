@@ -1,4 +1,4 @@
-package com.group02.mindmingle.feature.auth.dto;
+package com.group02.mindmingle.dto.auth;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

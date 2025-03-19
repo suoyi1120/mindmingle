@@ -1,6 +1,6 @@
-package com.group02.mindmingle.feature.user.controller;
+package com.group02.mindmingle.controller;
 
-import com.group02.mindmingle.feature.user.entity.User;
+import com.group02.mindmingle.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

@@ -1,12 +1,11 @@
-package com.group02.mindmingle.feature.auth.controller;
+package com.group02.mindmingle.controller;
 
-import com.group02.mindmingle.feature.auth.dto.JwtResponse;
-import com.group02.mindmingle.feature.auth.dto.LoginRequest;
-import com.group02.mindmingle.feature.auth.dto.RegisterRequest;
-import com.group02.mindmingle.feature.auth.dto.RegisterResponse;
-import com.group02.mindmingle.feature.auth.service.AuthService;
+import com.group02.mindmingle.dto.auth.JwtResponse;
+import com.group02.mindmingle.dto.auth.LoginRequest;
+import com.group02.mindmingle.dto.auth.RegisterRequest;
+import com.group02.mindmingle.dto.auth.RegisterResponse;
+import com.group02.mindmingle.service.AuthService;
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;

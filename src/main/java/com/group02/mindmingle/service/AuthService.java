@@ -1,12 +1,12 @@
-package com.group02.mindmingle.feature.auth.service;
+package com.group02.mindmingle.service;
 
 import com.group02.mindmingle.common.security.JwtTokenUtil;
-import com.group02.mindmingle.feature.auth.dto.JwtResponse;
-import com.group02.mindmingle.feature.auth.dto.LoginRequest;
-import com.group02.mindmingle.feature.auth.dto.RegisterRequest;
-import com.group02.mindmingle.feature.auth.dto.RegisterResponse;
-import com.group02.mindmingle.feature.user.entity.User;
-import com.group02.mindmingle.feature.user.service.UserService;
+import com.group02.mindmingle.dto.auth.JwtResponse;
+import com.group02.mindmingle.dto.auth.LoginRequest;
+import com.group02.mindmingle.dto.auth.RegisterRequest;
+import com.group02.mindmingle.dto.auth.RegisterResponse;
+import com.group02.mindmingle.model.User;
+import com.group02.mindmingle.service.UserService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;

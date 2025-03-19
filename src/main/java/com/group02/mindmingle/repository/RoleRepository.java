@@ -1,6 +1,6 @@
-package com.group02.mindmingle.feature.auth.repository;
+package com.group02.mindmingle.repository;
 
-import com.group02.mindmingle.feature.auth.entity.Role;
+import com.group02.mindmingle.model.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

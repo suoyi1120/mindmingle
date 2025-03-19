@@ -1,7 +1,7 @@
 package com.group02.mindmingle.config;
 
 import com.group02.mindmingle.common.security.JwtRequestFilter;
-import com.group02.mindmingle.feature.user.service.UserService;
+import com.group02.mindmingle.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
