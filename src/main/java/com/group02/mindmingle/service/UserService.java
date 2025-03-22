@@ -35,12 +35,7 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public User registerUser(User user, boolean isAdmin) {
-        // 检查用户名是否已存在
-        if (userRepository.existsByUsername(user.getUsername())) {
-            throw new RuntimeException("用户名已被占用");
-        }
-
-        // 检查邮箱是否已存在
+         // 检查邮箱是否已存在
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new RuntimeException("邮箱已被注册");
         }
