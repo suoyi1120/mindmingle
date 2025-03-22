@@ -62,6 +62,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
                 jwt = authorizationHeader.substring(7);
                 try {
+
                     username = jwtTokenUtil.extractUsername(jwt);
                 } catch (Exception e) {
                     logger.error("从Authorization头解析JWT令牌失败", e);

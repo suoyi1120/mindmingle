@@ -18,7 +18,7 @@ public class ChatController {
      */
     @PostMapping("/send")
     public ResponseEntity<?> sendMessage(@RequestBody Map<String, String> messageBody,
-            Authentication authentication) {
+                                         Authentication authentication) {
         // 从Authentication对象中获取当前用户信息
         User currentUser = (User) authentication.getPrincipal();
 

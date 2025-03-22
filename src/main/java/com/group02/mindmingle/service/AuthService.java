@@ -44,6 +44,7 @@ public class AuthService {
 
         // 生成JWT令牌
         User userDetails = (User) authentication.getPrincipal();
+        System.out.println("userDetails: " + userDetails);
         String jwt = jwtTokenUtil.generateToken(userDetails);
 
         // 提取角色信息
