@@ -60,10 +60,20 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/public/**").permitAll()
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated())
+
+
+                        // .requestMatchers("/api/auth/**").permitAll()
+                        // .requestMatchers("/api/public/**").permitAll()
+                        // .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        // .anyRequest().authenticated()
+                        
+
+                        .anyRequest().permitAll() // ✅ 允许所有请求，无需登录
+                        
+                        )
+
+                        
+
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
