@@ -36,7 +36,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             FilterChain chain) throws ServletException, IOException {
 
         String jwt = null;
-        String username = null;
+        String email = null;
 
         // 首先尝试从Cookie中获取JWT令牌
         Cookie[] cookies = request.getCookies();
@@ -48,7 +48,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             if (jwtCookie.isPresent()) {
                 jwt = jwtCookie.get().getValue();
                 try {
-                    username = jwtTokenUtil.extractUsername(jwt);
+                    email = jwtTokenUtil.extractEmail(jwt);
                 } catch (Exception e) {
                     logger.error("从Cookie解析JWT令牌失败", e);
                 }
@@ -56,24 +56,23 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
 
         // 如果Cookie中没有JWT，则尝试从Authorization头中获取
-        if (username == null) {
+        if (email == null) {
             final String authorizationHeader = request.getHeader("Authorization");
 
             if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
                 jwt = authorizationHeader.substring(7);
                 try {
-
-                    username = jwtTokenUtil.extractUsername(jwt);
+                    email = jwtTokenUtil.extractEmail(jwt);
                 } catch (Exception e) {
                     logger.error("从Authorization头解析JWT令牌失败", e);
                 }
             }
         }
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userService.loadUserByUsername(username);
+        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = userService.loadUserByEmail(email);
 
-            if (jwtTokenUtil.validateToken(jwt, userDetails)) {
+            if (jwtTokenUtil.validateTokenWithEmail(jwt, userDetails)) {
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
 

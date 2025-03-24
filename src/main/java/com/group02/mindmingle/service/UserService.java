@@ -27,15 +27,20 @@ public class UserService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // 尝试通过用户名或邮箱查找用户
-        return userRepository.findByUsernameOrEmail(username, username)
-                .orElseThrow(() -> new UsernameNotFoundException("用户名或邮箱不存在: " + username));
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        // 只通过邮箱查找用户
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("用户不存在: " + email));
+    }
+
+    public UserDetails loadUserByEmail(String email) throws UsernameNotFoundException {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("用户不存在: " + email));
     }
 
     @Transactional
     public User registerUser(User user, boolean isAdmin) {
-         // 检查邮箱是否已存在
+        // 检查邮箱是否已存在
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new RuntimeException("邮箱已被注册");
         }

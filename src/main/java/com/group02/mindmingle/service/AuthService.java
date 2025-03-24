@@ -21,66 +21,65 @@ import java.util.stream.Collectors;
 @Service
 public class AuthService {
 
-    private final AuthenticationManager authenticationManager;
-    private final UserService userService;
-    private final JwtTokenUtil jwtTokenUtil;
+        private final AuthenticationManager authenticationManager;
+        private final UserService userService;
+        private final JwtTokenUtil jwtTokenUtil;
 
-    public AuthService(AuthenticationManager authenticationManager, UserService userService,
-            JwtTokenUtil jwtTokenUtil) {
-        this.authenticationManager = authenticationManager;
-        this.userService = userService;
-        this.jwtTokenUtil = jwtTokenUtil;
-    }
+        public AuthService(AuthenticationManager authenticationManager, UserService userService,
+                        JwtTokenUtil jwtTokenUtil) {
+                this.authenticationManager = authenticationManager;
+                this.userService = userService;
+                this.jwtTokenUtil = jwtTokenUtil;
+        }
 
-    public JwtResponse authenticateUser(LoginRequest loginRequest) {
-        // 执行身份验证
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getEmail(),
-                        loginRequest.getPassword()));
+        public JwtResponse authenticateUser(LoginRequest loginRequest) {
+                // 执行身份验证
+                Authentication authentication = authenticationManager.authenticate(
+                                new UsernamePasswordAuthenticationToken(
+                                                loginRequest.getEmail(),
+                                                loginRequest.getPassword()));
 
-        // 设置认证上下文
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+                // 设置认证上下文
+                SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // 生成JWT令牌
-        User userDetails = (User) authentication.getPrincipal();
-        System.out.println("userDetails: " + userDetails);
-        String jwt = jwtTokenUtil.generateToken(userDetails);
+                // 生成JWT令牌
+                User userDetails = (User) authentication.getPrincipal();
+                String jwt = jwtTokenUtil.generateToken(userDetails, userDetails.getId(), userDetails.getEmail());
 
-        // 提取角色信息
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
+                // 提取角色信息
+                List<String> roles = userDetails.getAuthorities().stream()
+                                .map(GrantedAuthority::getAuthority)
+                                .collect(Collectors.toList());
 
-        // 构建并返回响应
-        return JwtResponse.builder()
-                .token(jwt)
-                .id(userDetails.getId())
-                .username(userDetails.getUsername())
-                .email(userDetails.getEmail())
-                .roles(roles)
-                .build();
-    }
+                // 构建并返回响应
+                return JwtResponse.builder()
+                                .token(jwt)
+                                .id(userDetails.getId())
+                                .username(userDetails.getUsername())
+                                .email(userDetails.getEmail())
+                                .roles(roles)
+                                .build();
+        }
 
-    public RegisterResponse registerUser(RegisterRequest registerRequest) {
-        // 构建用户实体
-        User user = User.builder()
-                .username(registerRequest.getUsername())
-                .password(registerRequest.getPassword())
-                .email(registerRequest.getEmail())
-                .firstName(registerRequest.getFirstName())
-                .lastName(registerRequest.getLastName())
-                .roles(new HashSet<>())
-                .build();
+        public RegisterResponse registerUser(RegisterRequest registerRequest) {
+                // 构建用户实体
+                User user = User.builder()
+                                .username(registerRequest.getUsername())
+                                .password(registerRequest.getPassword())
+                                .email(registerRequest.getEmail())
+                                .firstName(registerRequest.getFirstName())
+                                .lastName(registerRequest.getLastName())
+                                .roles(new HashSet<>())
+                                .build();
 
-        // 调用用户服务进行注册
-        User registeredUser = userService.registerUser(user, false);
+                // 调用用户服务进行注册
+                User registeredUser = userService.registerUser(user, false);
 
-        // 返回注册响应
-        return RegisterResponse.builder()
-                .message("用户注册成功")
-                .success(true)
-                .userId(registeredUser.getId())
-                .build();
-    }
+                // 返回注册响应
+                return RegisterResponse.builder()
+                                .message("用户注册成功")
+                                .success(true)
+                                .userId(registeredUser.getId())
+                                .build();
+        }
 }

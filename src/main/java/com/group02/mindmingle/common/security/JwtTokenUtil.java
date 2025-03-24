@@ -1,5 +1,6 @@
 package com.group02.mindmingle.common.security;
 
+import com.group02.mindmingle.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -89,6 +90,11 @@ public class JwtTokenUtil {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    public Boolean validateTokenWithEmail(String token, UserDetails userDetails) {
+        final String email = extractEmail(token);
+        return (email.equals(((User)userDetails).getEmail()) && !isTokenExpired(token));
     }
 
     private Boolean isTokenExpired(String token) {
