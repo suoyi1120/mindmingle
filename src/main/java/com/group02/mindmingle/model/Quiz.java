@@ -1,29 +1,26 @@
 package com.group02.mindmingle.model;
-
-
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "quizzes") // 让 JPA 知道它对应的是数据库的 quizzes 表
+@Table(name = "quizzes") // Let JPA know that it corresponds to the quizzes table of the database
 @Data
-
 
 public class Quiz {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // ID 自增
-    @Column(name = "quiz_id") // 指定数据库字段名，防止不匹配
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // ID Auto-increment
+    @Column(name = "quiz_id") // Unique ID
     private Long quizId;
 
-    @Column(name = "user_id", nullable = false) // 关联用户ID
+    @Column(name = "user_id", nullable = false) // Associated User ID
     private Long userId;
 
-    @Column(name = "title", nullable = false, length = 100) // Quiz 标题
+    @Column(name = "title", nullable = false, length = 100) // Quiz Titel
     private String title;
 
-    @Column(name = "description", columnDefinition = "TEXT") // 描述
+    @Column(name = "description", columnDefinition = "TEXT") // Description
     private String description;
 
     @Column(name = "created_at", nullable = false)
