@@ -31,10 +31,10 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) {
         // 初始化角色
-        initRoles();
+        // initRoles();
 
         // 初始化管理员账户
-        initAdminUser();
+        // initAdminUser();
     }
 
     private void initRoles() {
