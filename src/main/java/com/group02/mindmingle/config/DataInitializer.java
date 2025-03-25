@@ -1,17 +1,19 @@
 package com.group02.mindmingle.config;
 
-import com.group02.mindmingle.model.Role;
-import com.group02.mindmingle.repository.RoleRepository;
-import com.group02.mindmingle.model.User;
-import com.group02.mindmingle.repository.UserRepository;
-import lombok.extern.slf4j.Slf4j;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
-import java.util.Set;
+import com.group02.mindmingle.model.Role;
+import com.group02.mindmingle.model.User;
+import com.group02.mindmingle.repository.RoleRepository;
+import com.group02.mindmingle.repository.UserRepository;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
