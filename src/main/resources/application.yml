@@ -14,7 +14,7 @@ spring:
     cache: false
 
   datasource:
-    url: jdbc:postgresql://mindmingle5703.postgres.database.azure.com:5432/mindmingle
+    url: jdbc:postgresql://mindmingle5703.postgres.database.azure.com:5432/postgres
     username: mindmingle
     password: mm123456!
     driver-class-name: org.postgresql.Driver
