@@ -64,7 +64,7 @@ jwt:
 openai:
   api:
     # OpenAI API 密钥 - 实际使用时应通过环境变量注入
-    key: ${OPENAI_API_KEY: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}
+    key: ${OPENAI_API_KEY:}
     # API 调用超时时间（秒）
     timeout: 60
     # 默认模型
