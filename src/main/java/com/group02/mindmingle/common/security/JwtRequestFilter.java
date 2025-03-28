@@ -40,6 +40,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         // 首先尝试从Cookie中获取JWT令牌
         Cookie[] cookies = request.getCookies();
+        System.out.println("cookies: " + "use cookies");
         if (cookies != null) {
             Optional<Cookie> jwtCookie = Arrays.stream(cookies)
                     .filter(cookie -> "jwt".equals(cookie.getName()))

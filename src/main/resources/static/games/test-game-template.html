@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{{gameName}}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .perspective-1000 { perspective: 1000px; }
+    .transform-style-preserve-3d { transform-style: preserve-3d; }
+    .backface-hidden { backface-visibility: hidden; }
+    .rotate-y-180 { transform: rotateY(180deg); }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+  <div class="p-6 flex flex-col items-center max-w-md mx-auto bg-white rounded-xl shadow-md">
+    <h2 class="text-2xl font-bold mb-6">{{gameName}}</h2>
+    <div class="w-64 h-96 perspective-1000 mx-auto cursor-pointer" id="card-container">
+      <div class="relative w-full h-full transition-transform duration-500 transform-style-preserve-3d" id="card">
+        <!-- 卡片正面 -->
+        <div class="absolute w-full h-full backface-hidden rounded-lg shadow-lg flex items-center justify-center text-center p-4 text-white" style="background-color: {{cardColor}}">
+          <div class="text-2xl font-bold">测试卡片 - 点击翻转</div>
+        </div>
+        
+        <!-- 卡片背面 -->
+        <div class="absolute w-full h-full backface-hidden rounded-lg shadow-lg flex items-center justify-center text-center p-4 bg-white border border-gray-200 text-gray-800" style="transform: rotateY(180deg)">
+          <div class="text-xl">{{cardText}}</div>
+        </div>
+      </div>
+    </div>
+    <div class="mt-4 text-center text-gray-600">
+      测试游戏ID: {{gameId}}
+    </div>
+  </div>
+  <script>
+    document.getElementById('card-container').addEventListener('click', function() {
+      document.getElementById('card').classList.toggle('rotate-y-180');
+    });
+  </script>
+</body>
+</html> 

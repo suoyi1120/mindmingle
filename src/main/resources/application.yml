@@ -59,3 +59,13 @@ jwt:
   secret: mindmingle_jwt_secret_key_for_authentication_and_authorization_2025
   # JWT令牌过期时间（秒）- 86400秒 = 24小时
   expiration: 86400
+
+# OpenAI 配置
+openai:
+  api:
+    # OpenAI API 密钥 - 实际使用时应通过环境变量注入
+    key: ${OPENAI_API_KEY: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}
+    # API 调用超时时间（秒）
+    timeout: 60
+    # 默认模型
+    model: gpt-4o-mini
