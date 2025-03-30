@@ -34,6 +34,17 @@ CREATE TABLE challenges (
     created_at TIMESTAMP DEFAULT NOW()
 );
 
+-- Create the challenge_participation table （NEW ADD！！！）
+CREATE TABLE challenge_participation (
+    participation_id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE,
+    challenges_id INTEGER REFERENCES challenges(challenges_id) ON DELETE CASCADE,
+    start_date TIMESTAMP DEFAULT NOW(),
+    progress INTEGER DEFAULT 0,
+    completed BOOLEAN DEFAULT FALSE
+);
+
+
 -- Create the community_posts table
 CREATE TABLE community_posts (
     post_id SERIAL PRIMARY KEY,
