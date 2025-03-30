@@ -34,10 +34,10 @@ public class ChallengeServiceImpl implements ChallengeService {
     @Override
     public void joinChallenge(Long challengeId, Long userId) {
         Optional<ChallengeParticipation> existingParticipation =
-                participationRepository.findByUser_UserIdAndChallenge_ChallengesId(userId, challengeId);
+                participationRepository.findByUser_IdAndChallenge_ChallengesId(userId, challengeId);
 
         if (existingParticipation.isPresent()) {
-            return; // 用户已加入该挑战，避免重复插入
+            return; 
         }
 
         Challenge challenge = challengeRepository.findById(challengeId)
@@ -53,6 +53,6 @@ public class ChallengeServiceImpl implements ChallengeService {
 
     @Override
     public List<ChallengeParticipation> getUserChallengeHistory(Long userId) {
-        return participationRepository.findByUser_UserId(userId);
+        return participationRepository.findByUser_Id(userId);
     }
 }
