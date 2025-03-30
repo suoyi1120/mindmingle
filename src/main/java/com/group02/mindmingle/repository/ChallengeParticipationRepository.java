@@ -9,8 +9,8 @@ import java.util.Optional;
 
 public interface ChallengeParticipationRepository extends JpaRepository<ChallengeParticipation, Long> {
     
-    Optional<ChallengeParticipation> findByUser_UserIdAndChallenge_ChallengesId(Long userId, Long challengeId);
-    List<ChallengeParticipation> findByUser_UserId(Long userId);
+    Optional<ChallengeParticipation> findByUser_IdAndChallenge_ChallengesId(Long userId, Long challengeId);
+    List<ChallengeParticipation> findByUser_Id(Long id);
 
 }
 
