@@ -1,22 +1,21 @@
 package com.group02.mindmingle.service;
 
 import com.group02.mindmingle.common.security.JwtTokenUtil;
-import com.group02.mindmingle.dto.auth.JwtResponse;
 import com.group02.mindmingle.dto.auth.LoginRequest;
 import com.group02.mindmingle.dto.auth.RegisterRequest;
 import com.group02.mindmingle.dto.auth.RegisterResponse;
+import com.group02.mindmingle.dto.user.UserDTO;
 import com.group02.mindmingle.model.User;
 import com.group02.mindmingle.service.UserService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class AuthService {
@@ -32,7 +31,10 @@ public class AuthService {
                 this.jwtTokenUtil = jwtTokenUtil;
         }
 
-        public JwtResponse authenticateUser(LoginRequest loginRequest) {
+        /**
+         * 优化的登录方法，使用UserDTO代替JwtResponse，并在这里处理cookie
+         */
+        public UserDTO login(LoginRequest loginRequest, HttpServletResponse response) {
                 // 执行身份验证
                 Authentication authentication = authenticationManager.authenticate(
                                 new UsernamePasswordAuthenticationToken(
@@ -42,23 +44,43 @@ public class AuthService {
                 // 设置认证上下文
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                // 生成JWT令牌
+                // 获取用户详情
                 User userDetails = (User) authentication.getPrincipal();
+
+                // 生成JWT令牌
                 String jwt = jwtTokenUtil.generateToken(userDetails, userDetails.getId(), userDetails.getEmail());
 
-                // 提取角色信息
-                List<String> roles = userDetails.getAuthorities().stream()
-                                .map(GrantedAuthority::getAuthority)
-                                .collect(Collectors.toList());
+                // 设置HTTP Only Cookie
+                setAuthCookie(response, jwt);
 
-                // 构建并返回响应
-                return JwtResponse.builder()
-                                .token(jwt)
-                                .id(userDetails.getId())
-                                .username(userDetails.getUsername())
-                                .email(userDetails.getEmail())
-                                .roles(roles)
-                                .build();
+                // 转换为DTO并返回
+                return userService.convertToDto(userDetails);
+        }
+
+        /**
+         * 设置认证Cookie
+         */
+        private void setAuthCookie(HttpServletResponse response, String token) {
+                Cookie jwtCookie = new Cookie("jwt", token);
+                jwtCookie.setHttpOnly(true);
+                jwtCookie.setSecure(true); // 在生产环境中使用HTTPS时启用
+                jwtCookie.setPath("/");
+                jwtCookie.setMaxAge(86400); // 设置为与JWT令牌相同的过期时间
+
+                response.addCookie(jwtCookie);
+        }
+
+        /**
+         * 清除认证Cookie，用于登出
+         */
+        public void clearAuthCookie(HttpServletResponse response) {
+                Cookie jwtCookie = new Cookie("jwt", null);
+                jwtCookie.setHttpOnly(true);
+                jwtCookie.setSecure(true);
+                jwtCookie.setPath("/");
+                jwtCookie.setMaxAge(0); // 立即过期
+
+                response.addCookie(jwtCookie);
         }
 
         public RegisterResponse registerUser(RegisterRequest registerRequest) {

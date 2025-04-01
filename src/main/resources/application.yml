@@ -1,4 +1,17 @@
 spring:
+  ai:
+    vertex:
+      ai:
+        gemini:
+          # Use kebab-case for the property name
+          project-id: gen-lang-client-0490903100
+          location: us-east4
+          chat:
+            options:
+              # Ensure this model name is correct and available in us-east4
+              model: gemini-2.5-pro-exp-03-25 # Example: Use a generally available model, or verify yours
+              temperature: 0.7
+
   application:
     # 应用程序名称，用于标识此应用
     name: mindmingle
@@ -69,3 +82,11 @@ openai:
     timeout: 60
     # 默认模型
     model: gpt-4o-mini
+
+# Gemini API配置
+gemini:
+  api:
+    url: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro-exp-03-25:generateContent?key=${GEMINI_API_KEY:AIzaSyBwu6EuFKsUCF5iHUPxHZmABZyjd_0KYm0}
+
+
+

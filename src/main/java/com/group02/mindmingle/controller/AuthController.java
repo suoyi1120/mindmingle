@@ -1,11 +1,10 @@
 package com.group02.mindmingle.controller;
 
-import com.group02.mindmingle.dto.auth.JwtResponse;
 import com.group02.mindmingle.dto.auth.LoginRequest;
 import com.group02.mindmingle.dto.auth.RegisterRequest;
 import com.group02.mindmingle.dto.auth.RegisterResponse;
+import com.group02.mindmingle.dto.user.UserDTO;
 import com.group02.mindmingle.service.AuthService;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -27,21 +26,9 @@ public class AuthController {
         @PostMapping("/login")
         public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest,
                         HttpServletResponse response) {
-                JwtResponse jwtResponse = authService.authenticateUser(loginRequest);
-
-                // 创建一个HTTP Only Cookie
-                Cookie jwtCookie = new Cookie("jwt", jwtResponse.getToken());
-                jwtCookie.setHttpOnly(true);
-                jwtCookie.setSecure(true); // 在生产环境中使用HTTPS时启用
-                jwtCookie.setPath("/");
-                jwtCookie.setMaxAge(86400); // 设置为与JWT令牌相同的过期时间
-
-                // 添加Cookie到响应中
-                response.addCookie(jwtCookie);
-
-                // 返回用户信息，但不包含token
-                jwtResponse.setToken(null);
-                return ResponseEntity.ok(jwtResponse);
+                // 使用新的login方法，直接返回UserDTO
+                UserDTO userDTO = authService.login(loginRequest, response);
+                return ResponseEntity.ok(userDTO);
         }
 
         @PostMapping("/register")
@@ -52,14 +39,8 @@ public class AuthController {
 
         @PostMapping("/logout")
         public ResponseEntity<?> logoutUser(HttpServletResponse response) {
-                // 创建一个空的过期Cookie来删除客户端的JWT Cookie
-                Cookie jwtCookie = new Cookie("jwt", null);
-                jwtCookie.setHttpOnly(true);
-                jwtCookie.setSecure(true);
-                jwtCookie.setPath("/");
-                jwtCookie.setMaxAge(0); // 立即过期
-
-                response.addCookie(jwtCookie);
+                // 使用AuthService中的方法清除cookie
+                authService.clearAuthCookie(response);
 
                 return ResponseEntity.ok().body(RegisterResponse.builder()
                                 .message("用户已成功登出")
