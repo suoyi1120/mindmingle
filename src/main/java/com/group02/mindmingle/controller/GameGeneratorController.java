@@ -21,7 +21,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 @RequestMapping("/api/admin/game-generator")
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class GameGeneratorController {
 
     // 存储生成的游戏

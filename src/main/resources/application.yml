@@ -49,12 +49,27 @@ spring:
     # 是否在日志中显示Hibernate生成的SQL语句，便于调试
     show-sql: true
 
+  cloud:
+    azure:
+      storage:
+        blob:
+          # 存储帐户的 Blob 服务端点 (从 Azure 门户复制)
+          endpoint: https://mindminglefile.blob.core.windows.net/
+          # 如果你在本地运行且想连接真实 Azure, 确保本地环境有凭据
+          # (例如，通过 Azure CLI 'az login' 登录, 或设置环境变量)
+
+# 自定义属性，用于指定默认操作的容器名
+azure:
+  storage:
+    container-name: generated-file
+
 server:
   # 应用程序运行的HTTP端口
   port: 8080
 
 logging:
   level:
+#    com.azure.identity: DEBUG
     org:
       # Spring框架的日志级别设置为INFO，显示一般信息、警告和错误
       springframework: INFO
@@ -87,6 +102,7 @@ openai:
 gemini:
   api:
     url: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro-exp-03-25:generateContent?key=${GEMINI_API_KEY:AIzaSyBwu6EuFKsUCF5iHUPxHZmABZyjd_0KYm0}
+
 
 
 
