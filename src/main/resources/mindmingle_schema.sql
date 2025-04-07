@@ -82,3 +82,18 @@ CREATE TABLE community_posts (
 );
 
 
+-- Change challenge table with two more column
+
+ALTER TABLE challenges
+ADD COLUMN gameIdentifier VARCHAR(255),
+ADD COLUMN storageUrl TEXT;
+
+UPDATE challenges
+SET gameIdentifier = 'confidence_2025_001'
+WHERE challenges_id = 1;
+
+ALTER TABLE challenges
+ALTER COLUMN gameIdentifier SET NOT NULL;
+
+CREATE UNIQUE INDEX idx_game_identifier_unique
+ON challenges(gameIdentifier);
