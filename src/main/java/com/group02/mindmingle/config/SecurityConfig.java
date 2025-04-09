@@ -1,7 +1,7 @@
 package com.group02.mindmingle.config;
 
-import com.group02.mindmingle.common.security.JwtRequestFilter;
-import com.group02.mindmingle.service.UserService;
+import java.util.Arrays;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -21,7 +21,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
+import com.group02.mindmingle.common.security.JwtRequestFilter;
+import com.group02.mindmingle.service.UserService;
 
 @Configuration
 @EnableWebSecurity
@@ -60,10 +61,20 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/public/**").permitAll()
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated())
+
+
+                        // .requestMatchers("/api/auth/**").permitAll()
+                        // .requestMatchers("/api/public/**").permitAll()
+                        // .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        // .anyRequest().authenticated()
+                        
+
+                        .anyRequest().permitAll() // 允许所有请求，无需登录
+                        
+                        )
+
+                        
+
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
