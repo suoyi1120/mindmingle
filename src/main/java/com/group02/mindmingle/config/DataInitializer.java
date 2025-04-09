@@ -33,16 +33,16 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) {
         // 初始化角色
-        // initRoles();
+         initRoles();
 
         // 初始化管理员账户
-        // initAdminUser();
+         initAdminUser();
     }
 
     private void initRoles() {
         log.info("开始初始化角色...");
 
-        if (roleRepository.count() == 0) {
+        if (roleRepository.count() < 2) {
             Role userRole = Role.builder()
                     .name("USER")
                     .description("普通用户角色")
@@ -55,9 +55,11 @@ public class DataInitializer implements CommandLineRunner {
 
             roleRepository.save(userRole);
             roleRepository.save(adminRole);
+            System.out.println("count:"+roleRepository.count());
 
             log.info("角色初始化完成");
         } else {
+            System.out.println("count:"+roleRepository.count());
             log.info("角色已存在，跳过初始化");
         }
     }

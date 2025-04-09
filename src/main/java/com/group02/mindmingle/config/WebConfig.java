@@ -45,7 +45,7 @@ public class WebConfig implements WebMvcConfigurer {
     public static class XFrameOptionsFilter extends OncePerRequestFilter {
         @Override
         protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-                FilterChain filterChain)
+                                        FilterChain filterChain)
                 throws ServletException, IOException {
 
             // 设置允许iframe嵌入的响应头
