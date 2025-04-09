@@ -94,6 +94,13 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- ModelMapper -->
+        <dependency>
+            <groupId>org.modelmapper</groupId>
+            <artifactId>modelmapper</artifactId>
+            <version>3.1.1</version>
+        </dependency>
+
         <!-- OpenAI ChatGPT Client -->
         <dependency>
             <groupId>com.theokanning.openai-gpt3-java</groupId>
@@ -121,7 +128,12 @@
             <artifactId>spring-cloud-azure-starter-storage-blob</artifactId>
         </dependency>
 
-
+        <!-- Apache Tika - 用于检测文件MIME类型 -->
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-core</artifactId>
+            <version>2.9.2</version>
+        </dependency>
 
     </dependencies>
 

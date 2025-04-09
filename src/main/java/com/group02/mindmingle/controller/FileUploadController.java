@@ -1,6 +1,6 @@
 package com.group02.mindmingle.controller;
 
-import com.group02.mindmingle.service.AzureBlobStorageService;
+import com.group02.mindmingle.service.FileUploadService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.UUID; // 用于生成唯一文件名
 
 @RestController
 @RequestMapping("/api/files") // 定义基础路径
@@ -17,11 +16,11 @@ public class FileUploadController {
 
     private static final Logger logger = LoggerFactory.getLogger(FileUploadController.class);
 
-    private final AzureBlobStorageService storageService;
+    private final FileUploadService fileUploadService;
 
     @Autowired
-    public FileUploadController(AzureBlobStorageService storageService) {
-        this.storageService = storageService;
+    public FileUploadController(FileUploadService fileUploadService) {
+        this.fileUploadService = fileUploadService;
     }
 
     @PostMapping("/upload")
@@ -32,16 +31,8 @@ public class FileUploadController {
         }
 
         try {
-            // 生成一个唯一的文件名，保留原始扩展名
-            String originalFilename = file.getOriginalFilename();
-            String fileExtension = "";
-            if (originalFilename != null && originalFilename.contains(".")) {
-                fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
-            }
-            String uniqueFileName = path + "/" + UUID.randomUUID().toString() + fileExtension; // 包含路径
-
-            // 调用 Service 上传文件
-            String fileUrl = storageService.uploadFile(uniqueFileName, file.getInputStream(), file.getSize());
+            // 使用FileUploadService上传文件
+            String fileUrl = fileUploadService.uploadFile(file, path);
 
             // 返回上传后的文件 URL
             return ResponseEntity.ok(fileUrl);
@@ -61,10 +52,7 @@ public class FileUploadController {
         // ... 实现游戏文件上传逻辑 ...
         // 比如接收一个 zip 包，解压后按 gameIdentifier 存放到对应 "目录"
         // String gameIdentifier = ...;
-        // storageService.uploadFile("generated-games/" + gameIdentifier +
-        // "/index.html", ...);
-        // storageService.uploadFile("generated-games/" + gameIdentifier + "/style.css",
-        // ...);
+        // 使用fileUploadService上传文件
         return ResponseEntity.ok("Game uploaded (logic needs implementation)");
     }
 }

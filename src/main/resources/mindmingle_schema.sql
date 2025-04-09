@@ -1,7 +1,7 @@
 -- Create the database
 -- CREATE DATABASE mindmingle;
 
--- Connect to the mindmingle database 
+-- Connect to the mindmingle database
 -- \c mindmingle;
 
 -- Create the users table
@@ -57,5 +57,5 @@ INSERT INTO challenges (user_id, title, description, duration) VALUES
 (2, '15-Day Writing Challenge', 'Write every day for 15 days', 15);
 
 INSERT INTO community_posts (user_id, post_title, post_content) VALUES
-(1, 'Excited about the challenge!', 'Looking forward to it.'),
+(1, 'Excited about the game!', 'Looking forward to it.'),
 (2, 'Best way to study for quizzes?', 'Any suggestions?');

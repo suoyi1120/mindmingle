@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateChallengeRequest {
+public class CreateGameRequest {
     @NotBlank(message = "标题不能为空")
     private String title;
 

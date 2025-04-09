@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -13,8 +16,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "challenges")
-public class Challenge {
+@Table(name = "games")
+@EntityListeners(AuditingEntityListener.class)
+public class Game {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,11 +36,14 @@ public class Challenge {
     @Column(nullable = false)
     private String imageUrl;
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "TEXT")
+    private String storageUrl;
+
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-    }
+    @LastModifiedDate
+    @Column(nullable = true)
+    private LocalDateTime updatedAt;
 }

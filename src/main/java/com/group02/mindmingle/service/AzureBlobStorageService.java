@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.io.InputStream;
 import java.io.IOException;
+import com.azure.storage.blob.models.BlobHttpHeaders;
 
 @Service
 public class AzureBlobStorageService {
@@ -22,7 +23,7 @@ public class AzureBlobStorageService {
 
     @Autowired
     public AzureBlobStorageService(BlobServiceClient blobServiceClient,
-                                   @Value("${azure.storage.container-name}") String containerName) {
+            @Value("${azure.storage.container-name}") String containerName) {
         this.blobServiceClient = blobServiceClient;
         this.containerName = containerName;
         // 初始化时获取 ContainerClient，并确保容器存在
@@ -43,7 +44,8 @@ public class AzureBlobStorageService {
                 logger.info("Container '{}' already exists.", containerName);
             }
         } catch (Exception e) {
-            logger.error("Error initializing container client for container '{}': {}", containerName, e.getMessage(), e);
+            logger.error("Error initializing container client for container '{}': {}", containerName, e.getMessage(),
+                    e);
             // 根据需要处理异常，例如抛出自定义异常
             throw new RuntimeException("Could not initialize container client", e);
         }
@@ -56,14 +58,14 @@ public class AzureBlobStorageService {
      * @param inputStream 文件内容的输入流
      * @param length      文件内容的长度 (byte)
      * @return 上传后文件的公共访问 URL
-     * @throws IOException 如果发生 IO 错误
+     * @throws IOException      如果发生 IO 错误
      * @throws RuntimeException 如果上传失败
      */
     public String uploadFile(String blobName, InputStream inputStream, long length) throws IOException {
         if (containerClient == null) {
             // 尝试再次初始化，或直接抛出错误
             initializeContainerClient();
-            if(containerClient == null) {
+            if (containerClient == null) {
                 throw new RuntimeException("Container client is not available.");
             }
         }
@@ -76,6 +78,48 @@ public class AzureBlobStorageService {
 
             String url = blobClient.getBlobUrl();
             logger.info("File uploaded successfully. URL: {}", url);
+            return url;
+        } catch (Exception e) {
+            logger.error("Error uploading file '{}' to container '{}': {}", blobName, containerName, e.getMessage(), e);
+            throw new RuntimeException("Error uploading file", e);
+        }
+    }
+
+    /**
+     * 上传文件到 Azure Blob Storage 并指定 Content-Type
+     *
+     * @param blobName    文件在 Blob 存储中的名称 (可以包含路径，例如 "games/mygame/index.html")
+     * @param inputStream 文件内容的输入流
+     * @param length      文件内容的长度 (byte)
+     * @param contentType 文件的Content-Type (MIME类型)
+     * @return 上传后文件的公共访问 URL
+     * @throws IOException      如果发生 IO 错误
+     * @throws RuntimeException 如果上传失败
+     */
+    public String uploadFileWithContentType(String blobName, InputStream inputStream, long length, String contentType)
+            throws IOException {
+        if (containerClient == null) {
+            // 尝试再次初始化，或直接抛出错误
+            initializeContainerClient();
+            if (containerClient == null) {
+                throw new RuntimeException("Container client is not available.");
+            }
+        }
+        try {
+            BlobClient blobClient = containerClient.getBlobClient(blobName);
+            logger.info("Uploading file to Azure Blob Storage. Container: '{}', Blob: '{}', Content-Type: '{}'",
+                    containerName, blobName, contentType);
+
+            // 设置Content-Type
+            BlobHttpHeaders headers = new BlobHttpHeaders()
+                    .setContentType(contentType);
+
+            // 上传文件并设置HTTP头信息
+            blobClient.upload(inputStream, length, true);
+            blobClient.setHttpHeaders(headers);
+
+            String url = blobClient.getBlobUrl();
+            logger.info("File uploaded successfully with Content-Type. URL: {}", url);
             return url;
         } catch (Exception e) {
             logger.error("Error uploading file '{}' to container '{}': {}", blobName, containerName, e.getMessage(), e);
