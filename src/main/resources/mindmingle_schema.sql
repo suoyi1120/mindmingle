@@ -1,7 +1,7 @@
 -- Create the database
 -- CREATE DATABASE mindmingle;
 
--- Connect to the mindmingle database
+-- Connect to the mindmingle database 
 -- \c mindmingle;
 
 -- Create the users table
@@ -24,6 +24,16 @@ CREATE TABLE quizzes (
     created_at TIMESTAMP DEFAULT NOW()
 );
 
+--Create the quiz_result tabel
+CREATE TABLE quiz_results (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL, 
+    quiz_id INTEGER NOT NULL,
+    score NUMERIC(5,2),
+    user_answers JSONB NOT NULL, 
+    completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Create the challenges table
 CREATE TABLE challenges (
     challenges_id SERIAL PRIMARY KEY,
@@ -32,6 +42,34 @@ CREATE TABLE challenges (
     description TEXT,
     duration INTEGER CHECK (duration IN (7, 15, 30)),
     created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Create the challenge_participation table 
+CREATE TABLE challenge_participation (
+    participation_id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE,
+    challenges_id INTEGER REFERENCES challenges(challenges_id) ON DELETE CASCADE,
+    start_date TIMESTAMP DEFAULT NOW(),
+    progress INTEGER DEFAULT 0,
+    completed BOOLEAN DEFAULT FALSE
+);
+
+--Create the reward table
+CREATE TABLE rewards (
+    id SERIAL PRIMARY KEY,
+    challenge_id INTEGER NOT NULL,
+    name VARCHAR(100) NOT NULL, 
+    description TEXT, 
+    icon_url TEXT, 
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+--create the user_reward table
+CREATE TABLE user_rewards (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    reward_id INTEGER NOT NULL,
+    obtained_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Create the community_posts table
@@ -43,19 +81,19 @@ CREATE TABLE community_posts (
     created_at TIMESTAMP DEFAULT NOW()
 );
 
--- Insert some test data
-INSERT INTO users (user_type, username, email, password, profile_data) VALUES
-('user', 'alice', 'alice@example.com', 'hashed_password_1', '{"interests": ["math", "coding"]}'),
-('admin', 'bob', 'bob@example.com', 'hashed_password_2', '{"role": "superadmin"}');
 
-INSERT INTO quizzes (user_id, title, description) VALUES
-(1, 'Math Quiz', 'A simple math test'),
-(2, 'Coding Quiz', 'Basic programming questions');
+-- Change challenge table with two more column
 
-INSERT INTO challenges (user_id, title, description, duration) VALUES
-(1, '30-Day Coding Challenge', 'Improve coding skills in 30 days', 30),
-(2, '15-Day Writing Challenge', 'Write every day for 15 days', 15);
+ALTER TABLE challenges
+ADD COLUMN gameIdentifier VARCHAR(255),
+ADD COLUMN storageUrl TEXT;
 
-INSERT INTO community_posts (user_id, post_title, post_content) VALUES
-(1, 'Excited about the game!', 'Looking forward to it.'),
-(2, 'Best way to study for quizzes?', 'Any suggestions?');
+UPDATE challenges
+SET gameIdentifier = 'confidence_2025_001'
+WHERE challenges_id = 1;
+
+ALTER TABLE challenges
+ALTER COLUMN gameIdentifier SET NOT NULL;
+
+CREATE UNIQUE INDEX idx_game_identifier_unique
+ON challenges(gameIdentifier);
