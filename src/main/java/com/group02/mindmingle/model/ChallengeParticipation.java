@@ -22,16 +22,15 @@ public class ChallengeParticipation {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "challenges_id")
+    @JoinColumn(name = "challenge_id")
     private Challenge challenge;
-    
+
     @Column(name = "start_date")
     private LocalDateTime startDate = LocalDateTime.now();
-  
+
     private Integer progress = 0;
-   
+
     private Boolean completed = false;
 
     // Getters and Setters
 }
-

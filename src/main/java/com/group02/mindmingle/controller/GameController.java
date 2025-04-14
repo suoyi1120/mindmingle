@@ -3,11 +3,13 @@ package com.group02.mindmingle.controller;
 import com.group02.mindmingle.dto.game.GameDto;
 import com.group02.mindmingle.dto.game.CreateGameRequest;
 import com.group02.mindmingle.exception.ResourceNotFoundException;
+import com.group02.mindmingle.model.User;
 import com.group02.mindmingle.service.GameService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -40,8 +42,14 @@ public class GameController {
     }
 
     @PostMapping
-    public ResponseEntity<GameDto> createGame(@Valid @RequestBody CreateGameRequest request) {
+    public ResponseEntity<GameDto> createGame(@Valid @RequestBody CreateGameRequest request, Authentication authentication) {
         GameDto savedGame = gameService.createGame(request);
+
+        User currentUser = (User) authentication.getPrincipal();
+
+        // 记录用户ID和消息 (实际项目中可能会存储到数据库)
+        System.out.println("用户ID: " + currentUser.getId() );
+
         return new ResponseEntity<>(savedGame, HttpStatus.CREATED);
     }
 

@@ -1,20 +1,27 @@
 package com.group02.mindmingle.model;
 
-
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "challenges")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Challenge {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long challengesId;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private Long id;
 
     private String title;
 
@@ -23,7 +30,21 @@ public class Challenge {
 
     private Integer duration;
 
+    @Enumerated(EnumType.STRING)
+    private ChallengeStatus status;
+
+    private LocalDate startTime;
+
+    private LocalDate endTime;
+
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    // Getters and Setters
+    private String iconUrl = "default-challenge.png";
+
+    @OneToMany(mappedBy = "challenge", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ChallengeDay> challengeDays = new ArrayList<>();
+
+    public enum ChallengeStatus {
+        DRAFT, PUBLISHED, ACTIVE, COMPLETED
+    }
 }
