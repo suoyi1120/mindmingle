@@ -12,16 +12,17 @@
 
 // }
 
-
 package com.group02.mindmingle;
 
+import java.sql.SQLException;
+
+import javax.sql.DataSource;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.context.WebServerApplicationContext;
-import javax.sql.DataSource;
-import java.sql.SQLException;
 
 @SpringBootApplication
 public class MindmingleApplication implements CommandLineRunner {
