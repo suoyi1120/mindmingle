@@ -114,10 +114,10 @@ public class CommunityPostServiceImpl implements CommunityPostService {
         User author = post.getAuthor();
         if (author != null) {
             dto.setAuthor(author.getUsername());
-            dto.setAvatar(author.getAvatar() != null ? author.getAvatar() : "/default-avatar.png");
+            dto.setAvatar(null);
         } else {
             dto.setAuthor("Anonymous");
-            dto.setAvatar("/default-avatar.png");
+            dto.setAvatar(null);
         }
         
         dto.setTime(formatTime(post.getCreatedAt()));
