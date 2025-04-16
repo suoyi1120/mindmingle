@@ -1,47 +1,55 @@
 package com.group02.mindmingle.controller;
 
-import com.group02.mindmingle.model.CommunityPost;
+import com.group02.mindmingle.dto.PostDTO;
+import com.group02.mindmingle.dto.PostCreateDTO;
 import com.group02.mindmingle.service.CommunityPostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-// import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/community")
+@RequestMapping("/api")
 public class CommunityPostController {
 
     @Autowired
     private CommunityPostService postService;
 
-    @PostMapping("/posts")
-    // @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CommunityPost> createPost(@RequestBody CommunityPost post) {
-        return ResponseEntity.ok(postService.createPost(post));
+    @GetMapping("/posts")
+    public ResponseEntity<List<PostDTO>> getAllPosts() {
+        return ResponseEntity.ok(postService.getAllPosts());
     }
 
-    @GetMapping("/posts")
-    public ResponseEntity<List<CommunityPost>> getAllVisiblePosts() {
-        return ResponseEntity.ok(postService.getAllVisiblePosts());
+    @PostMapping(value = "/posts", consumes = {"multipart/form-data"})
+    public ResponseEntity<PostDTO> createPost(
+            @RequestPart("title") String title,
+            @RequestPart("description") String description,
+            @RequestPart(value = "image", required = false) MultipartFile image,
+            Authentication authentication) {
+        
+        PostCreateDTO postDTO = new PostCreateDTO();
+        postDTO.setTitle(title);
+        postDTO.setDescription(description);
+        
+        Long userId = Long.parseLong(authentication.getName());
+        return ResponseEntity.ok(postService.createPost(postDTO, image, userId));
     }
 
     @GetMapping("/posts/{id}")
-    public ResponseEntity<CommunityPost> getPostById(@PathVariable Long id) {
-        return postService.getPostById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<PostDTO> getPostById(@PathVariable Long id) {
+        return ResponseEntity.ok(postService.getPostById(id));
     }
 
-    @PutMapping("/posts/{id}")
-    // @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CommunityPost> updatePost(@PathVariable Long id, @RequestBody CommunityPost post) {
-        return ResponseEntity.ok(postService.updatePost(id, post));
+    @PostMapping("/posts/{id}/like")
+    public ResponseEntity<PostDTO> likePost(@PathVariable Long id, Authentication authentication) {
+        Long userId = Long.parseLong(authentication.getName());
+        return ResponseEntity.ok(postService.likePost(id, userId));
     }
 
     @DeleteMapping("/posts/{id}")
-    // @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deletePost(@PathVariable Long id) {
         postService.deletePost(id);
         return ResponseEntity.noContent().build();

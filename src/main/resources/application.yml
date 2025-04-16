@@ -57,3 +57,13 @@ jwt:
   secret: mindmingle_jwt_secret_key_for_authentication_and_authorization_2025
   # JWT令牌过期时间（秒）- 86400秒 = 24小时
   expiration: 86400
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+      
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher

@@ -11,6 +11,9 @@ CREATE TABLE users (
     username VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    avatar VARCHAR(255),
     created_at TIMESTAMP DEFAULT NOW(),
     profile_data JSONB
 );
@@ -78,6 +81,8 @@ CREATE TABLE community_posts (
     user_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE,
     post_title TEXT NOT NULL,
     post_content TEXT NOT NULL,
+    image_url TEXT,
+    likes INTEGER DEFAULT 0,
     created_at TIMESTAMP DEFAULT NOW()
 );
 
