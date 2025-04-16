@@ -8,6 +8,6 @@ import java.util.List;
 
 @Repository
 public interface CommunityPostRepository extends JpaRepository<CommunityPost, Long> {
-    List<CommunityPost> findByAuthorId(Long userId);
+    List<CommunityPost> findByAuthor_Id(Long userId);
     List<CommunityPost> findAllByOrderByCreatedAtDesc();
 }

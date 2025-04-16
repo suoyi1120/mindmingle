@@ -83,7 +83,7 @@ public class CommunityPostServiceImpl implements CommunityPostService {
 
     @Override
     public List<PostDTO> getPostsByUser(Long userId) {
-        return postRepository.findByAuthorId(userId).stream()
+        return postRepository.findByAuthor_Id(userId).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
