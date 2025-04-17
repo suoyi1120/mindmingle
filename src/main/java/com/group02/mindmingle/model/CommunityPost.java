@@ -39,5 +39,7 @@ public class CommunityPost {
 
     private boolean isVisible;
 
+    private int likes = 0;
+
     // Constructors, Getters and Setters omitted for brevity (same as above)
 }
