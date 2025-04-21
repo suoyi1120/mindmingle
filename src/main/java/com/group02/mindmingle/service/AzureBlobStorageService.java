@@ -131,4 +131,44 @@ public class AzureBlobStorageService {
     // public InputStream downloadFile(String blobName) { ... }
     // public void deleteFile(String blobName) { ... }
     // public List<String> listFiles() { ... }
+
+    /**
+     * 从Azure Blob Storage删除文件
+     *
+     * @param blobName 要删除的文件在Blob存储中的名称（可以包含路径）
+     * @return 删除是否成功
+     * @throws RuntimeException 如果删除失败
+     */
+    public boolean deleteFile(String blobName) {
+        if (containerClient == null) {
+            // 尝试再次初始化
+            initializeContainerClient();
+            if (containerClient == null) {
+                throw new RuntimeException("Container client is not available.");
+            }
+        }
+
+        try {
+            BlobClient blobClient = containerClient.getBlobClient(blobName);
+
+            // 检查文件是否存在
+            if (!blobClient.exists()) {
+                logger.warn("File '{}' does not exist in container '{}'", blobName, containerName);
+                return false;
+            }
+
+            logger.info("Deleting file from Azure Blob Storage. Container: '{}', Blob: '{}'",
+                    containerName, blobName);
+
+            // 删除文件
+            blobClient.delete();
+
+            logger.info("File deleted successfully: {}", blobName);
+            return true;
+        } catch (Exception e) {
+            logger.error("Error deleting file '{}' from container '{}': {}",
+                    blobName, containerName, e.getMessage(), e);
+            throw new RuntimeException("Error deleting file", e);
+        }
+    }
 }

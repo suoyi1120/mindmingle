@@ -17,4 +17,5 @@ public class GameDto {
     private String imageUrl;
     private String storageUrl;
     private String createdAt; // 作为格式化的字符串
+    private String updatedAt; // 作为格式化的字符串
 }

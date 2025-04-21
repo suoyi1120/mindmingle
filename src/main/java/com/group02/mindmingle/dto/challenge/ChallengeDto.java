@@ -24,4 +24,5 @@ public class ChallengeDto {
     private LocalDate endTime;
     private LocalDateTime createdAt;
     private List<ChallengeDayDto> challengeDays;
+    private String imageUrl;
 }

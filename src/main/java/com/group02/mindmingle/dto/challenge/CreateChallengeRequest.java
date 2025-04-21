@@ -21,6 +21,7 @@ public class CreateChallengeRequest {
     private LocalDate endTime;
     private Challenge.ChallengeStatus status;
     private List<CreateChallengeDayRequest> challengeDays;
+    private String imageUrl;
 
     @Data
     @Builder

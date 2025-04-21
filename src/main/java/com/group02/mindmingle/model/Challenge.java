@@ -39,7 +39,7 @@ public class Challenge {
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    private String iconUrl = "default-challenge.png";
+    private String imageUrl = "https://via.placeholder.com/300x150";
 
     @OneToMany(mappedBy = "challenge", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChallengeDay> challengeDays = new ArrayList<>();

@@ -71,8 +71,23 @@ public class GameGeneratorController {
                                 .build());
             }
 
+            logger.info("开始为游戏ID {} 生成HTML，提示词: {}", gameId, text);
+
             // 调用服务生成游戏HTML
             GameDto updatedGame = gameService.generateGameHtml(gameId, text);
+
+            // 记录更新后的游戏信息
+            logger.info("游戏HTML生成成功: ID={}, 标题={}, 存储URL={}",
+                    updatedGame.getId(), updatedGame.getTitle(), updatedGame.getStorageUrl());
+
+            if (updatedGame.getStorageUrl() == null || updatedGame.getStorageUrl().isEmpty()) {
+                logger.error("生成的游戏没有有效的存储URL");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                        ApiResponse.<GameGeneratorResponse>builder()
+                                .success(false)
+                                .message("游戏生成成功但没有存储URL")
+                                .build());
+            }
 
             // 构建响应
             GameGeneratorResponse response = GameGeneratorResponse.builder()
@@ -81,12 +96,33 @@ public class GameGeneratorController {
                     .storageUrl(updatedGame.getStorageUrl())
                     .build();
 
-            return ResponseEntity.ok(
-                    ApiResponse.<GameGeneratorResponse>builder()
-                            .success(true)
-                            .message("游戏HTML生成成功")
-                            .data(response)
-                            .build());
+            // 日志记录响应对象
+            logger.info("构建的响应对象: gameId={}, title={}, storageUrl={}",
+                    response.getGameId(), response.getTitle(), response.getStorageUrl());
+
+            // 返回成功响应
+            ApiResponse<GameGeneratorResponse> apiResponse = ApiResponse.<GameGeneratorResponse>builder()
+                    .success(true)
+                    .message("游戏HTML生成成功")
+                    .data(response)
+                    .build();
+
+            // 确保响应数据存在
+            if (apiResponse.getData() == null) {
+                logger.error("响应数据为null");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                        ApiResponse.<GameGeneratorResponse>builder()
+                                .success(false)
+                                .message("内部服务器错误：响应数据为null")
+                                .build());
+            }
+
+            // 日志记录最终API响应
+            logger.info("API响应: success={}, message={}, data={}",
+                    apiResponse.isSuccess(), apiResponse.getMessage(),
+                    apiResponse.getData() != null ? "存在" : "null");
+
+            return ResponseEntity.ok(apiResponse);
 
         } catch (ResourceNotFoundException e) {
             logger.error("生成游戏HTML时找不到资源", e);

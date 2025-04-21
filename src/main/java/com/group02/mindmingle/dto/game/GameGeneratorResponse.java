@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GameGeneratorResponse {
-    private Long gameId;
+    private long gameId;
     private String title;
     private String storageUrl;
 }

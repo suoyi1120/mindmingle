@@ -74,4 +74,79 @@ public class FileUploadService {
                 file.getSize(),
                 contentType);
     }
+
+    /**
+     * 从Azure Blob Storage删除文件
+     *
+     * @param fileUrl 要删除的文件URL或Blob名称
+     * @return 删除是否成功
+     */
+    public boolean deleteFile(String fileUrl) {
+        if (fileUrl == null || fileUrl.trim().isEmpty()) {
+            throw new IllegalArgumentException("文件URL不能为空");
+        }
+
+        // 从URL中提取Blob名称
+        String blobName = extractBlobNameFromUrl(fileUrl);
+        logger.info("从URL中提取的Blob名称: {}", blobName);
+
+        // 委托给AzureBlobStorageService来执行实际的删除操作
+        return azureBlobStorageService.deleteFile(blobName);
+    }
+
+    /**
+     * 从URL中提取Azure Blob名称
+     *
+     * @param fileUrl 文件的URL
+     * @return Blob名称
+     */
+    private String extractBlobNameFromUrl(String fileUrl) {
+        // 检查是否已经是一个Blob名称（不包含完整URL）
+        if (!fileUrl.startsWith("http")) {
+            return fileUrl;
+        }
+
+        try {
+            // 检查是否是Azure存储URL
+            if (fileUrl.contains("blob.core.windows.net")) {
+                // 提取容器名后的部分作为blobName
+                String[] parts = fileUrl.split("\\.net/");
+                if (parts.length > 1) {
+                    String containerAndBlob = parts[1];
+                    // 跳过容器名称和斜杠
+                    int containerEndIndex = containerAndBlob.indexOf('/');
+                    if (containerEndIndex >= 0) {
+                        String blobName = containerAndBlob.substring(containerEndIndex + 1);
+                        // 对URL编码的字符进行解码
+                        blobName = java.net.URLDecoder.decode(blobName, "UTF-8");
+                        return blobName;
+                    }
+                    // 对URL编码的字符进行解码
+                    containerAndBlob = java.net.URLDecoder.decode(containerAndBlob, "UTF-8");
+                    return containerAndBlob; // 如果没有斜杠，返回整个字符串
+                }
+            }
+
+            // 如果不是标准Azure URL格式，则尝试从URL中提取文件名部分
+            String[] pathParts = fileUrl.split("/");
+            if (pathParts.length > 0) {
+                String fileName = pathParts[pathParts.length - 1];
+                // 对URL编码的字符进行解码
+                fileName = java.net.URLDecoder.decode(fileName, "UTF-8");
+                return fileName;
+            }
+
+            // 如果无法解析，返回原始URL并解码
+            return java.net.URLDecoder.decode(fileUrl, "UTF-8");
+        } catch (Exception e) {
+            logger.warn("无法从URL中提取Blob名称，使用完整URL: {}, 错误: {}", fileUrl, e.getMessage());
+            try {
+                // 尝试至少解码URL
+                return java.net.URLDecoder.decode(fileUrl, "UTF-8");
+            } catch (Exception ex) {
+                // 如果解码失败，返回原始URL
+                return fileUrl;
+            }
+        }
+    }
 }

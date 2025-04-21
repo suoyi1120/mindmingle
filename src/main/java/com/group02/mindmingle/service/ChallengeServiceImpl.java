@@ -19,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -29,6 +31,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class ChallengeServiceImpl implements ChallengeService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ChallengeServiceImpl.class);
 
     @Autowired
     private ChallengeRepository challengeRepository;
@@ -44,6 +48,9 @@ public class ChallengeServiceImpl implements ChallengeService {
 
     @Autowired
     private ChallengeDayRepository challengeDayRepository;
+
+    @Autowired
+    private FileUploadService fileUploadService;
 
     // 用户相关方法
     @Override
@@ -90,6 +97,11 @@ public class ChallengeServiceImpl implements ChallengeService {
                 .createdAt(LocalDateTime.now())
                 .challengeDays(new ArrayList<>())
                 .build();
+
+        // 设置挑战封面图片URL
+        if (request.getImageUrl() != null && !request.getImageUrl().isEmpty()) {
+            challenge.setImageUrl(request.getImageUrl());
+        }
 
         // 如果是发布状态，检查游戏数量是否等于持续天数
         if (request.getStatus() == Challenge.ChallengeStatus.PUBLISHED) {
@@ -143,12 +155,34 @@ public class ChallengeServiceImpl implements ChallengeService {
         }
 
         try {
+            // 保存旧的封面URL，用于后续删除
+            String oldImageUrl = challenge.getImageUrl();
+
             // 更新基本信息
             challenge.setTitle(request.getTitle());
             challenge.setDescription(request.getDescription());
             challenge.setStartTime(request.getStartTime());
             challenge.setEndTime(request.getEndTime());
             challenge.setStatus(request.getStatus());
+
+            // 更新封面图片URL
+            if (request.getImageUrl() != null && !request.getImageUrl().isEmpty()
+                    && !request.getImageUrl().equals(oldImageUrl)) {
+                challenge.setImageUrl(request.getImageUrl());
+
+                // 如果旧图片URL不是默认图片且与新图片URL不同，则删除旧图片
+                if (oldImageUrl != null && !oldImageUrl.isEmpty()
+                        && !oldImageUrl.contains("placeholder.com")
+                        && !oldImageUrl.equals(request.getImageUrl())) {
+                    try {
+                        logger.info("删除旧的挑战封面图片: {}", oldImageUrl);
+                        fileUploadService.deleteFile(oldImageUrl);
+                    } catch (Exception e) {
+                        // 记录错误但不影响主流程
+                        logger.error("删除旧的挑战封面图片时出错: {}", e.getMessage(), e);
+                    }
+                }
+            }
 
             // 清空挑战日列表但先不删除数据库中的记录
             List<ChallengeDay> oldChallengeDays = new ArrayList<>(challenge.getChallengeDays());
@@ -281,6 +315,7 @@ public class ChallengeServiceImpl implements ChallengeService {
                 .endTime(challenge.getEndTime())
                 .createdAt(challenge.getCreatedAt())
                 .challengeDays(challengeDayDtos)
+                .imageUrl(challenge.getImageUrl())
                 .build();
     }
 

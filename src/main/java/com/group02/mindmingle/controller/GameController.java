@@ -42,15 +42,28 @@ public class GameController {
     }
 
     @PostMapping
-    public ResponseEntity<GameDto> createGame(@Valid @RequestBody CreateGameRequest request, Authentication authentication) {
+    public ResponseEntity<GameDto> createGame(@Valid @RequestBody CreateGameRequest request,
+            Authentication authentication) {
         GameDto savedGame = gameService.createGame(request);
 
         User currentUser = (User) authentication.getPrincipal();
 
         // 记录用户ID和消息 (实际项目中可能会存储到数据库)
-        System.out.println("用户ID: " + currentUser.getId() );
+        System.out.println("用户ID: " + currentUser.getId());
 
         return new ResponseEntity<>(savedGame, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<GameDto> updateGame(
+            @PathVariable Long id,
+            @Valid @RequestBody CreateGameRequest request) {
+        try {
+            GameDto updatedGame = gameService.updateGame(id, request);
+            return ResponseEntity.ok(updatedGame);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping("/{id}")

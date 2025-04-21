@@ -33,6 +33,13 @@ spring:
     password: mm123456!
     # PostgreSQL数据库驱动类名
     driver-class-name: org.postgresql.Driver
+  
+  #最大上传文件大小
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 50MB
+
 
   jpa:
     hibernate:
@@ -101,7 +108,7 @@ openai:
 # Gemini API配置
 gemini:
   api:
-    url: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro-exp-03-25:generateContent?key=${GEMINI_API_KEY:AIzaSyBwu6EuFKsUCF5iHUPxHZmABZyjd_0KYm0}
+    url: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=${GEMINI_API_KEY:AIzaSyDBkB9ZQB0gXWzJtzbUMKBIA2gaEHPaay0}
 
 
 
