@@ -1,5 +1,6 @@
 package com.group02.mindmingle.controller;
 
+import com.group02.mindmingle.dto.challenge.ChallengeDto;
 import com.group02.mindmingle.model.Challenge;
 import com.group02.mindmingle.model.ChallengeParticipation;
 import com.group02.mindmingle.service.ChallengeService;
@@ -17,8 +18,9 @@ public class ChallengeController {
     private ChallengeService challengeService;
 
     @GetMapping
-    public List<Challenge> listAllChallenges() {
-        return challengeService.getAllChallenges();
+    public List<ChallengeDto> listAllChallenges(@RequestParam(required = false) String status) {
+        // 使用Service层的getDefaultChallenges方法，逻辑已移至Service层
+        return challengeService.getDefaultChallenges(status);
     }
 
     @PostMapping("/join/{challengeId}")

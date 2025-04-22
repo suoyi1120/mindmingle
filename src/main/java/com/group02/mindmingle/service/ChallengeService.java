@@ -12,6 +12,9 @@ public interface ChallengeService {
     // 用户挑战相关
     List<Challenge> getAllChallenges();
 
+    // 根据状态获取挑战(直接返回Challenge列表)
+    List<Challenge> getChallengesByStatusModel(Challenge.ChallengeStatus status);
+
     void joinChallenge(Long challengeId, Long userId);
 
     List<ChallengeParticipation> getUserChallengeHistory(Long userId);
@@ -26,6 +29,9 @@ public interface ChallengeService {
     List<ChallengeDto> getAllChallengesForAdmin();
 
     List<ChallengeDto> getChallengesByStatus(Challenge.ChallengeStatus status);
+
+    // 获取默认挑战列表（优先返回ACTIVE状态的挑战）
+    List<ChallengeDto> getDefaultChallenges(String status);
 
     void deleteChallenge(Long challengeId);
 

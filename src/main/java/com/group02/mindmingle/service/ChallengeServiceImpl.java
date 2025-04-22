@@ -59,6 +59,11 @@ public class ChallengeServiceImpl implements ChallengeService {
     }
 
     @Override
+    public List<Challenge> getChallengesByStatusModel(Challenge.ChallengeStatus status) {
+        return challengeRepository.findByStatus(status);
+    }
+
+    @Override
     public void joinChallenge(Long challengeId, Long userId) {
         Optional<ChallengeParticipation> existingParticipation = participationRepository
                 .findByUser_IdAndChallenge_Id(userId, challengeId);
@@ -257,6 +262,26 @@ public class ChallengeServiceImpl implements ChallengeService {
         return challenges.stream()
                 .map(this::mapToChallengeDto)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 获取默认挑战列表（ACTIVE状态）
+     * 如果提供了状态参数，则返回该状态的挑战列表
+     * 如果状态参数无效，则返回ACTIVE状态的挑战列表
+     */
+    @Override
+    public List<ChallengeDto> getDefaultChallenges(String status) {
+        if (status != null && !status.isEmpty()) {
+            try {
+                Challenge.ChallengeStatus challengeStatus = Challenge.ChallengeStatus.valueOf(status.toUpperCase());
+                return getChallengesByStatus(challengeStatus);
+            } catch (IllegalArgumentException e) {
+                // 如果状态参数无效，返回ACTIVE状态的挑战
+                return getChallengesByStatus(Challenge.ChallengeStatus.ACTIVE);
+            }
+        }
+        // 默认返回ACTIVE状态的挑战
+        return getChallengesByStatus(Challenge.ChallengeStatus.ACTIVE);
     }
 
     @Override
