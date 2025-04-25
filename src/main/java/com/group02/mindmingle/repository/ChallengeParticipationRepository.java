@@ -12,4 +12,6 @@ public interface ChallengeParticipationRepository extends JpaRepository<Challeng
 
     List<ChallengeParticipation> findByUser_Id(Long id);
 
+    List<ChallengeParticipation> findByStatus(ChallengeParticipation.Status status);
+
 }

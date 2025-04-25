@@ -1,47 +1,36 @@
-package com.group02.mindmingle.service;
+package com.group02.mindmingle.service.impl;
 
 import com.group02.mindmingle.dto.challenge.ChallengeDto;
-import com.group02.mindmingle.dto.challenge.ChallengeDayDto;
 import com.group02.mindmingle.dto.challenge.CreateChallengeRequest;
+import com.group02.mindmingle.exception.ResourceNotFoundException;
+import com.group02.mindmingle.mapper.ChallengeMapper;
 import com.group02.mindmingle.model.Challenge;
 import com.group02.mindmingle.model.ChallengeDay;
-import com.group02.mindmingle.model.ChallengeParticipation;
-import com.group02.mindmingle.model.User;
 import com.group02.mindmingle.model.Game;
-import com.group02.mindmingle.repository.ChallengeParticipationRepository;
-import com.group02.mindmingle.repository.ChallengeRepository;
-import com.group02.mindmingle.repository.UserRepository;
-import com.group02.mindmingle.repository.GameRepository;
 import com.group02.mindmingle.repository.ChallengeDayRepository;
-import com.group02.mindmingle.exception.ResourceNotFoundException;
+import com.group02.mindmingle.repository.ChallengeRepository;
+import com.group02.mindmingle.repository.GameRepository;
+import com.group02.mindmingle.service.FileUploadService;
+import com.group02.mindmingle.service.IAdminChallengeService;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class ChallengeServiceImpl implements ChallengeService {
+public class AdminChallengeServiceImpl implements IAdminChallengeService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ChallengeServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(AdminChallengeServiceImpl.class);
 
     @Autowired
     private ChallengeRepository challengeRepository;
-
-    @Autowired
-    private ChallengeParticipationRepository participationRepository;
-
-    @Autowired
-    private UserRepository userRepository;
 
     @Autowired
     private GameRepository gameRepository;
@@ -52,43 +41,9 @@ public class ChallengeServiceImpl implements ChallengeService {
     @Autowired
     private FileUploadService fileUploadService;
 
-    // 用户相关方法
-    @Override
-    public List<Challenge> getAllChallenges() {
-        return challengeRepository.findAll();
-    }
+    @Autowired
+    private ChallengeMapper challengeMapper;
 
-    @Override
-    public List<Challenge> getChallengesByStatusModel(Challenge.ChallengeStatus status) {
-        return challengeRepository.findByStatus(status);
-    }
-
-    @Override
-    public void joinChallenge(Long challengeId, Long userId) {
-        Optional<ChallengeParticipation> existingParticipation = participationRepository
-                .findByUser_IdAndChallenge_Id(userId, challengeId);
-
-        if (existingParticipation.isPresent()) {
-            return;
-        }
-
-        Challenge challenge = challengeRepository.findById(challengeId)
-                .orElseThrow(() -> new ResourceNotFoundException("Challenge not found"));
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-
-        ChallengeParticipation participation = new ChallengeParticipation();
-        participation.setChallenge(challenge);
-        participation.setUser(user);
-        participationRepository.save(participation);
-    }
-
-    @Override
-    public List<ChallengeParticipation> getUserChallengeHistory(Long userId) {
-        return participationRepository.findByUser_Id(userId);
-    }
-
-    // 管理员相关方法
     @Override
     @Transactional
     public ChallengeDto createChallenge(CreateChallengeRequest request) {
@@ -137,7 +92,7 @@ public class ChallengeServiceImpl implements ChallengeService {
             savedChallenge.setChallengeDays(challengeDays);
         }
 
-        return mapToChallengeDto(savedChallenge);
+        return challengeMapper.mapToChallengeDto(savedChallenge);
     }
 
     @Override
@@ -233,55 +188,12 @@ public class ChallengeServiceImpl implements ChallengeService {
 
             // 最终保存并返回
             Challenge finalChallenge = challengeRepository.save(challenge);
-            return mapToChallengeDto(finalChallenge);
+            return challengeMapper.mapToChallengeDto(finalChallenge);
         } catch (Exception e) {
             // 记录详细错误信息
             e.printStackTrace();
             throw new RuntimeException("Failed to update challenge: " + e.getMessage(), e);
         }
-    }
-
-    @Override
-    public ChallengeDto getChallengeById(Long challengeId) {
-        Challenge challenge = challengeRepository.findById(challengeId)
-                .orElseThrow(() -> new ResourceNotFoundException("Challenge not found with id: " + challengeId));
-        return mapToChallengeDto(challenge);
-    }
-
-    @Override
-    public List<ChallengeDto> getAllChallengesForAdmin() {
-        List<Challenge> challenges = challengeRepository.findAll();
-        return challenges.stream()
-                .map(this::mapToChallengeDto)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<ChallengeDto> getChallengesByStatus(Challenge.ChallengeStatus status) {
-        List<Challenge> challenges = challengeRepository.findByStatus(status);
-        return challenges.stream()
-                .map(this::mapToChallengeDto)
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * 获取默认挑战列表（ACTIVE状态）
-     * 如果提供了状态参数，则返回该状态的挑战列表
-     * 如果状态参数无效，则返回ACTIVE状态的挑战列表
-     */
-    @Override
-    public List<ChallengeDto> getDefaultChallenges(String status) {
-        if (status != null && !status.isEmpty()) {
-            try {
-                Challenge.ChallengeStatus challengeStatus = Challenge.ChallengeStatus.valueOf(status.toUpperCase());
-                return getChallengesByStatus(challengeStatus);
-            } catch (IllegalArgumentException e) {
-                // 如果状态参数无效，返回ACTIVE状态的挑战
-                return getChallengesByStatus(Challenge.ChallengeStatus.ACTIVE);
-            }
-        }
-        // 默认返回ACTIVE状态的挑战
-        return getChallengesByStatus(Challenge.ChallengeStatus.ACTIVE);
     }
 
     @Override
@@ -296,61 +208,5 @@ public class ChallengeServiceImpl implements ChallengeService {
         }
 
         challengeRepository.delete(challenge);
-    }
-
-    // 定时任务：每小时检查一次挑战状态
-    @Override
-    @Scheduled(cron = "0 0 * * * *") // 每小时执行一次
-    @Transactional
-    public void updateChallengeStatuses() {
-        LocalDate today = LocalDate.now();
-
-        // 发布 -> 进行中：已发布且开始时间已到或已过
-        List<Challenge> publishedChallenges = challengeRepository.findByStatusAndStartTimeLessThanEqual(
-                Challenge.ChallengeStatus.PUBLISHED, today);
-
-        for (Challenge challenge : publishedChallenges) {
-            challenge.setStatus(Challenge.ChallengeStatus.ACTIVE);
-            challengeRepository.save(challenge);
-        }
-
-        // 进行中 -> 已结束：进行中且结束时间已过
-        List<Challenge> activeChallenges = challengeRepository.findByStatusAndEndTimeLessThan(
-                Challenge.ChallengeStatus.ACTIVE, today);
-
-        for (Challenge challenge : activeChallenges) {
-            challenge.setStatus(Challenge.ChallengeStatus.COMPLETED);
-            challengeRepository.save(challenge);
-        }
-    }
-
-    // DTO转换方法
-    private ChallengeDto mapToChallengeDto(Challenge challenge) {
-        List<ChallengeDayDto> challengeDayDtos = challenge.getChallengeDays().stream()
-                .map(this::mapToChallengeDayDto)
-                .collect(Collectors.toList());
-
-        return ChallengeDto.builder()
-                .id(challenge.getId())
-                .title(challenge.getTitle())
-                .description(challenge.getDescription())
-                .duration(challenge.getDuration())
-                .challengeStatus(challenge.getStatus())
-                .startTime(challenge.getStartTime())
-                .endTime(challenge.getEndTime())
-                .createdAt(challenge.getCreatedAt())
-                .challengeDays(challengeDayDtos)
-                .imageUrl(challenge.getImageUrl())
-                .build();
-    }
-
-    private ChallengeDayDto mapToChallengeDayDto(ChallengeDay challengeDay) {
-        return ChallengeDayDto.builder()
-                .id(challengeDay.getId())
-                .challengeId(challengeDay.getChallenge().getId())
-                .gameId(challengeDay.getGame().getId())
-                .gameTitle(challengeDay.getGame().getTitle())
-                .dayNumber(challengeDay.getDayNumber())
-                .build();
     }
 }

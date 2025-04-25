@@ -15,4 +15,6 @@ public class ChallengeDayDto {
     private Long gameId;
     private String gameTitle; // 前端显示用
     private Integer dayNumber;
+    private String description; // 游戏描述
+    private String storageUrl; // 游戏存储URL
 }
