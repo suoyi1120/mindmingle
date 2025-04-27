@@ -1,8 +1,11 @@
 package com.group02.mindmingle.service.impl;
 
 import com.group02.mindmingle.dto.challenge.ChallengeProgressDto;
+import com.group02.mindmingle.dto.challenge.ChallengeDayDto;
+import com.group02.mindmingle.dto.game.GameProgressDto;
 import com.group02.mindmingle.exception.ResourceNotFoundException;
 import com.group02.mindmingle.model.Challenge;
+import com.group02.mindmingle.model.ChallengeDay;
 import com.group02.mindmingle.model.ChallengeParticipation;
 import com.group02.mindmingle.model.User;
 import com.group02.mindmingle.repository.ChallengeParticipationRepository;
@@ -30,6 +33,9 @@ public class UserChallengeServiceImpl implements IUserChallengeService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private ChallengeQueryServiceImpl challengeQueryService;
 
     @Override
     public void joinChallenge(Long challengeId, Long userId) {
@@ -147,5 +153,33 @@ public class UserChallengeServiceImpl implements IUserChallengeService {
         participationRepository.save(participation);
 
         return true;
+    }
+
+    @Override
+    public GameProgressDto getDailyGameWithProgress(Long challengeId, Integer day, Long userId) {
+        // 获取游戏基本信息
+        ChallengeDayDto challengeDayDto = challengeQueryService.getDailyGame(challengeId, day);
+
+        // 默认未完成
+        boolean completed = false;
+
+        // 如果用户ID不为空，检查用户是否完成了该游戏
+        if (userId != null) {
+            Optional<ChallengeParticipation> participationOpt = participationRepository
+                    .findByUser_IdAndChallenge_Id(userId, challengeId);
+
+            if (participationOpt.isPresent()) {
+                ChallengeParticipation participation = participationOpt.get();
+                List<Integer> completedDays = participation.getCompletedDays();
+
+                // 检查用户是否完成了这天的游戏
+                if (completedDays != null && completedDays.contains(day)) {
+                    completed = true;
+                }
+            }
+        }
+
+        // 转换为GameProgressDto并返回
+        return GameProgressDto.fromChallengeDayDto(challengeDayDto, completed);
     }
 }

@@ -34,7 +34,4 @@ public interface IChallengeQueryService {
 
     // 获取特定日期的游戏内容
     ChallengeDayDto getDailyGame(Long challengeId, Integer day);
-
-    // 获取特定日期的游戏内容，并带有完成状态
-    GameProgressDto getDailyGameWithProgress(Long challengeId, Integer day, Long userId);
 }

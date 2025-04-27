@@ -69,7 +69,7 @@ public class ChallengeController {
         }
 
         // 获取游戏信息和完成状态
-        GameProgressDto dailyGame = challengeQueryService.getDailyGameWithProgress(challengeId, day, userId);
+        GameProgressDto dailyGame = userChallengeService.getDailyGameWithProgress(challengeId, day, userId);
         return ResponseEntity.ok(dailyGame);
     }
 

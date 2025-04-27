@@ -1,6 +1,7 @@
 package com.group02.mindmingle.service;
 
 import com.group02.mindmingle.dto.challenge.ChallengeProgressDto;
+import com.group02.mindmingle.dto.game.GameProgressDto;
 import com.group02.mindmingle.model.ChallengeParticipation;
 
 import java.util.List;
@@ -23,4 +24,7 @@ public interface IUserChallengeService {
 
     // 完成某一天的游戏挑战
     boolean completeDailyGame(Long challengeId, Long userId, Integer day);
+
+    // 获取特定日期的游戏内容，并带有完成状态
+    GameProgressDto getDailyGameWithProgress(Long challengeId, Integer day, Long userId);
 }
