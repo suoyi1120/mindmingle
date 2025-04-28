@@ -9,5 +9,6 @@ import java.util.List;
 @Repository
 public interface CommunityPostRepository extends JpaRepository<CommunityPost, Long> {
     List<CommunityPost> findByIsVisibleTrueOrderByCreatedAtDesc();
+    List<CommunityPost> findByIsVisibleTrue();
     List<CommunityPost> findByAuthorId(Long userId);
 }

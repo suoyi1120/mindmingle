@@ -12,4 +12,5 @@ public interface CommunityPostService {
     CommunityPost updatePost(Long id, CommunityPost updatedPost);
     void deletePost(Long id);
     List<CommunityPost> getPostsByUser(Long userId);
+    CommunityPost likePost(Long id);
 }
