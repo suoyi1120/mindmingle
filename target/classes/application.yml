@@ -26,7 +26,7 @@ spring:
 
   datasource:
     # 数据库连接URL，指定连接到本地PostgreSQL服务器上的mindmingle数据库
-    url: jdbc:postgresql://mindmingle5703.postgres.database.azure.com:5432/postgres
+    url: jdbc:postgresql://mindmingle5703-new.postgres.database.azure.com:5432/postgres
     # 数据库用户名
     username: mindmingle
     # 数据库密码 - 实际使用时应考虑加密或使用环境变量
