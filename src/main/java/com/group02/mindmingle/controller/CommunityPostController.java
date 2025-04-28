@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/community")
+@RequestMapping("/api")
 public class CommunityPostController {
 
     @Autowired
@@ -25,7 +25,7 @@ public class CommunityPostController {
     // Add a community post
     @PostMapping("/posts")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CommunityPostDTO> createPost(@RequestBody CommunityPost post) {
+    public ResponseEntity<CommunityPostDTO> createPost(@ModelAttribute CommunityPost post) {
         CommunityPost savedPost = postService.createPost(post);
         return ResponseEntity.ok(postMapper.toDTO(savedPost));
     }
