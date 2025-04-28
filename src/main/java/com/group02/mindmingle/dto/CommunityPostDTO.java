@@ -3,6 +3,7 @@ package com.group02.mindmingle.dto;
 import lombok.Data;
 import java.time.LocalDateTime;
 
+@Data
 public class CommunityPostDTO {
     private Long id;
     private String title;
