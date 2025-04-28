@@ -173,12 +173,8 @@ public class GameService {
         logger.info("为游戏 '{}' (ID: {}) 生成HTML内容", game.getTitle(), gameId);
 
         try {
-            // 创建Gemini请求
-            Parts parts = new Parts();
-            parts.setText(promptText);
-
-            // 调用Gemini API生成HTML代码
-            String geminiResponse = geminiService.generateTextResponse(parts);
+            // 使用新的方法生成HTML代码
+            String geminiResponse = geminiService.generateGameHtml(promptText);
             logger.debug("Gemini API返回响应长度: {} 字符", geminiResponse.length());
 
             // 从响应中提取HTML代码

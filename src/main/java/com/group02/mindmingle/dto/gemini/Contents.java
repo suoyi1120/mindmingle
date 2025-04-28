@@ -4,6 +4,7 @@ import java.util.List;
 
 public class Contents {
     private List<Parts> parts;
+    private String role;
 
     public Contents() {
     }
@@ -14,5 +15,13 @@ public class Contents {
 
     public void setParts(List<Parts> parts) {
         this.parts = parts;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }
