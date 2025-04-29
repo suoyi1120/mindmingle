@@ -3,6 +3,7 @@ package com.group02.mindmingle.controller;
 import com.group02.mindmingle.dto.challenge.ChallengeDto;
 import com.group02.mindmingle.dto.challenge.ChallengeDayDto;
 import com.group02.mindmingle.dto.challenge.ChallengeProgressDto;
+import com.group02.mindmingle.dto.challenge.UserChallengeProgressDTO;
 import com.group02.mindmingle.dto.game.GameProgressDto;
 import com.group02.mindmingle.model.ChallengeParticipation;
 import com.group02.mindmingle.model.User;
@@ -113,5 +114,16 @@ public class ChallengeController {
 
         boolean completed = userChallengeService.completeDailyGame(challengeId, userId, day);
         return ResponseEntity.ok(Map.of("success", completed));
+    }
+
+    // 获取当前用户的所有挑战进度
+    @GetMapping("/current-user-challenges")
+    public ResponseEntity<List<UserChallengeProgressDTO>> getCurrentUserChallenges(Authentication authentication) {
+        // 从Authentication对象中获取当前用户信息
+        User currentUser = (User) authentication.getPrincipal();
+        Long userId = currentUser.getId();
+
+        List<UserChallengeProgressDTO> challenges = userChallengeService.getCurrentUserChallenges(userId);
+        return ResponseEntity.ok(challenges);
     }
 }

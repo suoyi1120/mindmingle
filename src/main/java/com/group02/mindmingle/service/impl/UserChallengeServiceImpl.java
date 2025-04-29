@@ -2,6 +2,7 @@ package com.group02.mindmingle.service.impl;
 
 import com.group02.mindmingle.dto.challenge.ChallengeProgressDto;
 import com.group02.mindmingle.dto.challenge.ChallengeDayDto;
+import com.group02.mindmingle.dto.challenge.UserChallengeProgressDTO;
 import com.group02.mindmingle.dto.game.GameProgressDto;
 import com.group02.mindmingle.exception.ResourceNotFoundException;
 import com.group02.mindmingle.model.Challenge;
@@ -21,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserChallengeServiceImpl implements IUserChallengeService {
@@ -181,5 +183,60 @@ public class UserChallengeServiceImpl implements IUserChallengeService {
 
         // 转换为GameProgressDto并返回
         return GameProgressDto.fromChallengeDayDto(challengeDayDto, completed);
+    }
+
+    @Override
+    public List<UserChallengeProgressDTO> getCurrentUserChallenges(Long userId) {
+        // 获取用户所有正在进行中的挑战
+        List<ChallengeParticipation> participations = participationRepository
+                .findByUser_IdAndStatus(userId, ChallengeParticipation.Status.ACTIVE);
+
+        // 将参与信息转换为DTO
+        return participations.stream().map(participation -> {
+            Challenge challenge = participation.getChallenge();
+
+            // 获取当前应该完成的挑战日
+            Integer currentDay = participation.getCurrentDay();
+
+            // 获取完成的天数作为进度
+            Integer progress = participation.getCompletedDays().size();
+
+            // 获取当天的游戏标题
+            String currentGameTitle = "";
+            try {
+                // 尝试获取当天的游戏
+                if (challenge.getChallengeDays() != null && currentDay <= challenge.getChallengeDays().size()) {
+                    List<ChallengeDay> days = challenge.getChallengeDays();
+                    // 查找匹配当前天数的挑战日
+                    for (ChallengeDay day : days) {
+                        // ChallengeDay类中可能使用了不同的字段名，根据实际情况调整
+                        if (day.getDayNumber() != null && day.getDayNumber().equals(currentDay)) {
+                            currentGameTitle = day.getGame().getTitle();
+                            break;
+                        }
+                    }
+                } else {
+                    // 如果没有在挑战天数中找到当前日期，尝试通过服务获取
+                    ChallengeDayDto dayDto = challengeQueryService.getDailyGame(challenge.getId(), currentDay);
+                    if (dayDto != null) {
+                        currentGameTitle = dayDto.getGameTitle();
+                    }
+                }
+            } catch (Exception e) {
+                // 如果发生异常，设置一个默认值
+                currentGameTitle = "今日游戏加载中...";
+            }
+
+            return UserChallengeProgressDTO.builder()
+                    .id(challenge.getId())
+                    .title(challenge.getTitle())
+                    .description(challenge.getDescription())
+                    .duration(challenge.getDuration())
+                    .progress(progress)
+                    .currentDay(currentDay)
+                    .currentGameTitle(currentGameTitle)
+                    .imageUrl(challenge.getImageUrl())
+                    .build();
+        }).collect(Collectors.toList());
     }
 }
