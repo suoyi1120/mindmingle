@@ -4,10 +4,12 @@ import com.group02.mindmingle.dto.challenge.ChallengeDto;
 import com.group02.mindmingle.dto.challenge.ChallengeDayDto;
 import com.group02.mindmingle.model.Challenge;
 import com.group02.mindmingle.model.ChallengeDay;
+import com.group02.mindmingle.model.ChallengeParticipation;
 
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -35,7 +37,25 @@ public class ChallengeMapper {
                 .createdAt(challenge.getCreatedAt())
                 .challengeDays(challengeDayDtos)
                 .imageUrl(challenge.getImageUrl())
+                .userStatus("ACTIVE") // 默认状态是ACTIVE
                 .build();
+    }
+
+    /**
+     * 将Challenge实体转换为ChallengeDto，并包含用户参与状态
+     */
+    public ChallengeDto mapToChallengeDto(Challenge challenge, Optional<ChallengeParticipation> participation) {
+        ChallengeDto dto = mapToChallengeDto(challenge);
+
+        if (participation.isPresent()) {
+            // 如果用户有参与记录，设置对应的状态
+            dto.setUserStatus(participation.get().getStatus().name());
+        } else {
+            // 如果用户没有参与记录，设置为"ACTIVE"(未参与)
+            dto.setUserStatus("ACTIVE");
+        }
+
+        return dto;
     }
 
     /**

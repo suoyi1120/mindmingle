@@ -80,6 +80,38 @@ public class ChallengeQueryServiceImpl implements IChallengeQueryService {
     }
 
     @Override
+    public List<ChallengeDto> getDefaultChallengesWithUserStatus(String status, Long userId) {
+        List<Challenge> challenges;
+
+        if (status != null && !status.isEmpty()) {
+            try {
+                Challenge.ChallengeStatus challengeStatus = Challenge.ChallengeStatus.valueOf(status.toUpperCase());
+                challenges = challengeRepository.findByStatus(challengeStatus);
+            } catch (IllegalArgumentException e) {
+                // 如果状态参数无效，返回ACTIVE状态的挑战
+                challenges = challengeRepository.findByStatus(Challenge.ChallengeStatus.ACTIVE);
+            }
+        } else {
+            // 默认返回ACTIVE状态的挑战
+            challenges = challengeRepository.findByStatus(Challenge.ChallengeStatus.ACTIVE);
+        }
+
+        // 获取用户的所有挑战参与记录
+        List<ChallengeParticipation> userParticipations = participationRepository.findByUser_Id(userId);
+
+        // 将Challenge转换为ChallengeDto，并添加用户参与状态
+        return challenges.stream().map(challenge -> {
+            // 查找用户对当前挑战的参与记录
+            Optional<ChallengeParticipation> participation = userParticipations.stream()
+                    .filter(p -> p.getChallenge().getId().equals(challenge.getId()))
+                    .findFirst();
+
+            // 调用带参与状态的映射方法
+            return challengeMapper.mapToChallengeDto(challenge, participation);
+        }).collect(Collectors.toList());
+    }
+
+    @Override
     public List<ChallengeDayDto> getChallengeDailyGames(Long challengeId) {
         Challenge challenge = challengeRepository.findById(challengeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Challenge not found with id: " + challengeId));

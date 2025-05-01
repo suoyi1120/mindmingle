@@ -146,6 +146,11 @@ public class UserChallengeServiceImpl implements IUserChallengeService {
         completedDays.add(day);
         participation.setCompletedDays(completedDays);
 
+        // 将状态改为JOINED
+        if (participation.getStatus() == ChallengeParticipation.Status.ACTIVE) {
+            participation.setStatus(ChallengeParticipation.Status.JOINED);
+        }
+
         // 检查是否应该更新状态为已完成
         if (completedDays.size() >= participation.getChallenge().getDuration()) {
             participation.setStatus(ChallengeParticipation.Status.COMPLETED);
@@ -189,7 +194,7 @@ public class UserChallengeServiceImpl implements IUserChallengeService {
     public List<UserChallengeProgressDTO> getCurrentUserChallenges(Long userId) {
         // 获取用户所有正在进行中的挑战
         List<ChallengeParticipation> participations = participationRepository
-                .findByUser_IdAndStatus(userId, ChallengeParticipation.Status.ACTIVE);
+                .findByUser_IdAndStatus(userId, ChallengeParticipation.Status.JOINED);
 
         // 将参与信息转换为DTO
         return participations.stream().map(participation -> {

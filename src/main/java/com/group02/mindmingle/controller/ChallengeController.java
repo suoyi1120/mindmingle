@@ -28,8 +28,16 @@ public class ChallengeController {
     private IUserChallengeService userChallengeService;
 
     @GetMapping
-    public List<ChallengeDto> listAllChallenges(@RequestParam(required = false) String status) {
-        // 使用查询服务获取挑战列表
+    public List<ChallengeDto> listAllChallenges(@RequestParam(required = false) String status,
+            Authentication authentication) {
+        // 如果用户已登录，获取带用户状态的挑战列表
+        if (authentication != null && authentication.getPrincipal() instanceof User) {
+            User currentUser = (User) authentication.getPrincipal();
+            Long userId = currentUser.getId();
+            return challengeQueryService.getDefaultChallengesWithUserStatus(status, userId);
+        }
+
+        // 用户未登录，使用原来的方法获取挑战列表
         return challengeQueryService.getDefaultChallenges(status);
     }
 
@@ -38,11 +46,12 @@ public class ChallengeController {
         return ResponseEntity.ok(challengeQueryService.getChallengeById(id));
     }
 
-    @PostMapping("/join/{challengeId}")
-    public ResponseEntity<String> joinChallenge(@PathVariable Long challengeId, @RequestBody Long userId) {
-        userChallengeService.joinChallenge(challengeId, userId);
-        return ResponseEntity.ok("Joined challenge successfully");
-    }
+    // @PostMapping("/join/{challengeId}")
+    // public ResponseEntity<String> joinChallenge(@PathVariable Long challengeId,
+    // @RequestBody Long userId) {
+    // userChallengeService.joinChallenge(challengeId, userId);
+    // return ResponseEntity.ok("Joined challenge successfully");
+    // }
 
     @GetMapping("/history/{userId}")
     public List<ChallengeParticipation> getHistory(@PathVariable Long userId) {

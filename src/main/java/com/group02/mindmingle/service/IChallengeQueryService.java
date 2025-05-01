@@ -29,6 +29,9 @@ public interface IChallengeQueryService {
     // 获取默认挑战列表（优先返回ACTIVE状态的挑战）
     List<ChallengeDto> getDefaultChallenges(String status);
 
+    // 获取默认挑战列表（优先返回ACTIVE状态的挑战），同时包含用户参与状态
+    List<ChallengeDto> getDefaultChallengesWithUserStatus(String status, Long userId);
+
     // 获取挑战的每日游戏列表
     List<ChallengeDayDto> getChallengeDailyGames(Long challengeId);
 

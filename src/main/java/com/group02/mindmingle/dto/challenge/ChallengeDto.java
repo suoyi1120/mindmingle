@@ -1,6 +1,7 @@
 package com.group02.mindmingle.dto.challenge;
 
 import com.group02.mindmingle.model.Challenge;
+import com.group02.mindmingle.model.ChallengeParticipation;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,4 +26,5 @@ public class ChallengeDto {
     private LocalDateTime createdAt;
     private List<ChallengeDayDto> challengeDays;
     private String imageUrl;
+    private String userStatus; // 用户对挑战的参与状态：ACTIVE(未参与), JOINED, COMPLETED
 }

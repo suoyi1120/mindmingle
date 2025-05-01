@@ -68,6 +68,7 @@ public class ChallengeParticipation {
 
     public enum Status {
         ACTIVE,
+        JOINED,
         COMPLETED
     }
 }
