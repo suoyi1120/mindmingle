@@ -27,18 +27,18 @@ public class UserProgressScheduler {
     /**
      * 定时任务：每天凌晨更新用户挑战进度
      */
-    @Scheduled(cron = "0 55 20 * * ?") // 每天凌晨12点执行
+    @Scheduled(cron = "0 30 01 * * ?") // 每天凌晨12点执行
     @Transactional
     public void updateUserChallengeProgress() {
         logger.info("开始执行用户挑战进度更新任务");
 
         // 获取所有进行中的挑战参与记录
-        List<ChallengeParticipation> activeParticipations = participationRepository
-                .findByStatus(ChallengeParticipation.Status.ACTIVE);
+        List<ChallengeParticipation> joinedParticipations = participationRepository
+                .findByStatus(ChallengeParticipation.Status.JOINED);
 
-        logger.info("找到 {} 个进行中的挑战参与记录", activeParticipations.size());
+        logger.info("找到 {} 个进行中的挑战参与记录", joinedParticipations.size());
 
-        for (ChallengeParticipation participation : activeParticipations) {
+        for (ChallengeParticipation participation : joinedParticipations) {
             Integer currentDay = participation.getCurrentDay();
             List<Integer> completedDays = participation.getCompletedDays();
 
