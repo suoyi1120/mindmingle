@@ -173,7 +173,7 @@ public class GameService {
         logger.info("为游戏 '{}' (ID: {}) 生成HTML内容", game.getTitle(), gameId);
 
         try {
-            // 使用新的方法生成HTML代码
+            // 使用geminiService直接生成HTML代码
             String geminiResponse = geminiService.generateGameHtml(promptText);
             logger.debug("Gemini API返回响应长度: {} 字符", geminiResponse.length());
 
@@ -204,16 +204,6 @@ public class GameService {
             game.setStorageUrl(fileUrl);
             Game updatedGame = gameRepository.save(game);
             logger.info("游戏记录已更新，存储URL: {}", updatedGame.getStorageUrl());
-
-            // 验证更新是否成功
-            Game verifiedGame = gameRepository.findById(gameId).orElse(null);
-            if (verifiedGame == null || verifiedGame.getStorageUrl() == null
-                    || verifiedGame.getStorageUrl().isEmpty()) {
-                logger.error("游戏URL保存验证失败");
-                throw new IllegalStateException("游戏URL保存验证失败");
-            }
-
-            logger.info("验证成功，游戏URL已保存: {}", verifiedGame.getStorageUrl());
 
             // 返回更新后的游戏DTO
             return modelMapper.map(updatedGame, GameDto.class);

@@ -40,9 +40,16 @@ public class GeminiService {
         this.resourceLoader = resourceLoader;
     }
 
+    /**
+     * 调用Gemini API发送请求并获取响应
+     * 
+     * @param prompt API请求对象
+     * @return API响应对象
+     */
     public GeminiResponse callGeminiAPI(Prompt prompt) {
         HttpEntity<Prompt> requestEntity = new HttpEntity<>(prompt);
-        System.out.println("Sending request to Gemini API with prompt: " + prompt);
+        logger.info("发送请求到Gemini API，完整prompt结构：\n{}", prompt.toString());
+
         ResponseEntity<GeminiResponse> response = restTemplate.exchange(
                 apiUrl,
                 HttpMethod.POST,
@@ -51,6 +58,12 @@ public class GeminiService {
         return response.getBody();
     }
 
+    /**
+     * 从Prompt获取响应文本
+     * 
+     * @param prompt API请求对象
+     * @return 响应文本
+     */
     public String getResponseText(Prompt prompt) {
         GeminiResponse response = callGeminiAPI(prompt);
         if (response == null || response.getCandidates() == null || response.getCandidates().isEmpty()) {
@@ -73,38 +86,40 @@ public class GeminiService {
         return result.toString();
     }
 
-    // 新增方法，从Parts构建Prompt
-    public Prompt buildPromptFromParts(Parts parts) {
+    /**
+     * 聊天功能，将系统提示和用户提示整合到一次请求中
+     * 
+     * @param chatRequest 包含系统提示和用户输入的请求
+     * @return 响应文本
+     */
+    public String chat(ChatRequest chatRequest) {
         Prompt prompt = new Prompt();
+        List<Contents> contentsList = new ArrayList<>();
+
+        // 创建一个Contents对象
         Contents contents = new Contents();
         contents.setRole("user");
 
-        List<Contents> contentsList = new ArrayList<>();
-        List<Parts> partsList = new ArrayList<>();
+        // 创建一个Parts对象，包含系统提示和用户输入
+        Parts parts = new Parts();
 
+        // 如果有系统提示，则将系统提示和用户输入组合在一起
+        if (chatRequest.getSystemPrompt() != null && !chatRequest.getSystemPrompt().isEmpty()) {
+            String combinedText = chatRequest.getSystemPrompt() + "\n\n" + chatRequest.getPrompt();
+            parts.setText(combinedText);
+        } else {
+            parts.setText(chatRequest.getPrompt());
+        }
+
+        // 设置Parts列表到Contents中
+        List<Parts> partsList = new ArrayList<>();
         partsList.add(parts);
         contents.setParts(partsList);
+
+        // 添加Contents到Prompt中
         contentsList.add(contents);
         prompt.setContents(contentsList);
 
-        return prompt;
-    }
-
-    // 生成调用API的响应
-    public GeminiResponse generateResponse(Parts parts) {
-        Prompt prompt = buildPromptFromParts(parts);
-        return callGeminiAPI(prompt);
-    }
-
-    // 生成文本响应
-    public String generateTextResponse(Parts parts) {
-        Prompt prompt = buildPromptFromParts(parts);
-        return getResponseText(prompt);
-    }
-
-    // 聊天功能
-    public String chat(ChatRequest chatRequest) {
-        Prompt prompt = chatRequest.toPrompt();
         return getResponseText(prompt);
     }
 
