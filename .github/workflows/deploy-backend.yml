@@ -1,0 +1,74 @@
+# .github/workflows/deploy-backend.yml
+# 部署 Spring Boot 后端应用到 Azure App Service 的完整 Workflow
+
+name: Deploy Backend to Azure App Service # 工作流名称
+
+on:
+  # --- 触发条件 ---
+  push:
+    branches:
+      - release/v1.0.0 # 当代码被推送到 main 分支时触发
+    paths:
+      # 监控 src 目录和 pom.xml 文件变更以触发部署
+      # 因为项目在根目录，所以直接写路径
+      - 'src/**'
+      - 'pom.xml'
+      # 如果想让任何推送都触发，可以移除 paths 这几行
+  workflow_dispatch: # 允许在 GitHub Actions 页面手动触发
+
+env:
+  # --- 自定义环境变量 ---
+  # !! 请务必根据你的实际情况修改 AZURE_WEBAPP_NAME !!
+  AZURE_WEBAPP_NAME: 'mindmingle-backend' # 修改为你的 Azure App Service 实例名称
+  JAVA_VERSION: '17'                           # 确认你的项目使用的 Java 版本
+
+jobs:
+  build-and-deploy: # 定义一个名为 build-and-deploy 的 job
+    runs-on: ubuntu-latest       # 使用 Ubuntu 最新版运行器
+    environment: production      # 可选: 定义环境，用于审批或变量/密钥作用域
+
+    steps: # Job 中的步骤
+      # 步骤 1: 检出代码
+      # 从你的仓库拉取最新代码到 Runner 虚拟机
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 步骤 2: 设置 Java 环境
+      # 安装指定版本的 Java JDK，并配置 Maven 缓存
+      - name: Set up Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'             # 使用 Temurin JDK
+          java-version: ${{ env.JAVA_VERSION }} # 使用上面 env 定义的 Java 版本
+          cache: 'maven'                      # 缓存 Maven 依赖项
+
+      # 步骤 3: 登录 Azure
+      # 使用存储在 GitHub Secrets 中的服务主体凭据登录 Azure CLI
+      - name: Log in to Azure CLI
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }} # 引用名为 AZURE_CREDENTIALS 的 Secret
+
+      # 步骤 4: 使用 Maven 构建项目
+      # 在仓库根目录执行 Maven Wrapper 进行打包，并跳过测试
+      - name: Build with Maven Wrapper
+        run: ./mvnw -B package -DskipTests # -B 表示批处理模式, -DskipTests 跳过测试
+
+      # 步骤 5: 部署到 Azure App Service
+      # 使用官方的 Azure Web Apps Deploy action 部署 JAR 包
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }} # 目标 App Service 名称
+          # package: 要部署的 JAR 包路径 (相对于仓库根目录)
+          package: '${{ github.workspace }}/target/*.jar'
+          # slot-name: 'staging' # 可选: 如果使用部署槽位，取消此行注释并指定槽位名
+
+      # 步骤 6: 登出 Azure (可选但推荐)
+      # 清理 Azure CLI 的登录状态
+      - name: Azure logout
+        run: |
+          az logout
+          az cache purge
+          az account clear
+        if: always() # 无论前面的步骤成功与否，总是尝试执行登出
