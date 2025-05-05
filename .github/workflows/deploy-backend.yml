@@ -54,6 +54,10 @@ jobs:
       - name: Make mvnw executable
         run: chmod +x ./mvnw # 在当前工作目录(仓库根目录)执行 chmod
 
+      # --- 原有的构建步骤 ---
+      - name: Build with Maven Wrapper
+        run: ./mvnw -B package -DskipTests
+
       # 步骤 5: 部署到 Azure App Service
       # 使用官方的 Azure Web Apps Deploy action 部署 JAR 包
       - name: Deploy to Azure Web App
