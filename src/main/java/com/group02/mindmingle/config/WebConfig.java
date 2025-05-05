@@ -1,5 +1,6 @@
 package com.group02.mindmingle.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -15,6 +16,9 @@ import java.io.IOException;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+
+    @Value("${app.frontend.url}")
+    private String frontendUrl;
 
     /**
      * 配置CORS
@@ -34,7 +38,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Bean
     public FilterRegistrationBean<XFrameOptionsFilter> xFrameOptionsFilter() {
         FilterRegistrationBean<XFrameOptionsFilter> registrationBean = new FilterRegistrationBean<>();
-        registrationBean.setFilter(new XFrameOptionsFilter());
+        registrationBean.setFilter(new XFrameOptionsFilter(frontendUrl));
         registrationBean.addUrlPatterns("/*"); // 应用于所有URL
         return registrationBean;
     }
@@ -43,9 +47,16 @@ public class WebConfig implements WebMvcConfigurer {
      * 自定义X-Frame-Options过滤器，允许特定URL嵌入iframe
      */
     public static class XFrameOptionsFilter extends OncePerRequestFilter {
+
+        private final String frontendUrl;
+
+        public XFrameOptionsFilter(String frontendUrl) {
+            this.frontendUrl = frontendUrl;
+        }
+
         @Override
         protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-                                        FilterChain filterChain)
+                FilterChain filterChain)
                 throws ServletException, IOException {
 
             // 设置允许iframe嵌入的响应头
@@ -53,7 +64,7 @@ public class WebConfig implements WebMvcConfigurer {
 
             // 使用更现代的Content-Security-Policy指令
             response.setHeader("Content-Security-Policy",
-                    "frame-ancestors 'self' http://localhost:3000");
+                    "frame-ancestors 'self' " + frontendUrl);
 
             filterChain.doFilter(request, response);
         }
