@@ -50,9 +50,9 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }} # 引用名为 AZURE_CREDENTIALS 的 Secret
 
       # 步骤 4: 使用 Maven 构建项目
-      # 在仓库根目录执行 Maven Wrapper 进行打包，并跳过测试
-      - name: Build with Maven Wrapper
-        run: ./mvnw -B package -DskipTests # -B 表示批处理模式, -DskipTests 跳过测试
+      # 在构建之前，确保 mvnw 脚本有执行权限
+      - name: Make mvnw executable
+        run: chmod +x ./mvnw # 在当前工作目录(仓库根目录)执行 chmod
 
       # 步骤 5: 部署到 Azure App Service
       # 使用官方的 Azure Web Apps Deploy action 部署 JAR 包
