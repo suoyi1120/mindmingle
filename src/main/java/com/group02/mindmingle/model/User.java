@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -38,6 +39,11 @@ public class User implements UserDetails {
     private String firstName;
 
     private String lastName;
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @Convert(converter = ProfileDataConverter.class)
+    @Column(name = "profile_data", columnDefinition = "jsonb")
+    private ProfileData profileData;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))

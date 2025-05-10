@@ -1,9 +1,10 @@
 package com.group02.mindmingle.service;
 
 import com.group02.mindmingle.dto.user.UserDTO;
+import com.group02.mindmingle.model.ProfileData;
 import com.group02.mindmingle.model.Role;
-import com.group02.mindmingle.repository.RoleRepository;
 import com.group02.mindmingle.model.User;
+import com.group02.mindmingle.repository.RoleRepository;
 import com.group02.mindmingle.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.context.annotation.Lazy;
@@ -24,7 +25,7 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
 
     public UserService(UserRepository userRepository, RoleRepository roleRepository,
-            @Lazy PasswordEncoder passwordEncoder) {
+                       @Lazy PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
@@ -32,7 +33,6 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        // 只通过邮箱查找用户
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("用户不存在: " + email));
     }
@@ -44,15 +44,12 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public User registerUser(User user, boolean isAdmin) {
-        // 检查邮箱是否已存在
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new RuntimeException("邮箱已被注册");
         }
 
-        // 加密密码
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        // 分配角色
         Role userRole = roleRepository.findByName("USER")
                 .orElseThrow(() -> new RuntimeException("角色不存在"));
         user.getRoles().add(userRole);
@@ -66,17 +63,14 @@ public class UserService implements UserDetailsService {
         return userRepository.save(user);
     }
 
-    /**
-     * 将User实体转换为UserDTO
-     */
     public UserDTO convertToDto(User user) {
-        if (user == null) {
-            return null;
-        }
+        if (user == null) return null;
 
         List<String> roles = user.getRoles().stream()
                 .map(Role::getName)
                 .collect(Collectors.toList());
+
+        ProfileData profile = user.getProfileData();
 
         return UserDTO.builder()
                 .id(user.getId())
@@ -85,15 +79,24 @@ public class UserService implements UserDetailsService {
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .roles(roles)
+                .nickname(profile != null ? profile.getNickname() : null)
+                .backgroundColor(profile != null ? profile.getBackgroundColor() : null)
+                .cardColor(profile != null ? profile.getCardColor() : null)
+                .avatarType(profile != null ? profile.getAvatarType() : null)
+                .avatarEmoji(profile != null ? profile.getAvatarEmoji() : null)
+                .avatarUrl(profile != null ? profile.getAvatarUrl() : null)
                 .build();
     }
 
-    /**
-     * 获取当前用户的DTO
-     */
     public UserDTO getCurrentUserDto(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("用户不存在: " + email));
         return convertToDto(user);
+    }
+
+    @Transactional
+    public void save(User user) {
+        // Ensure we're flushing changes to the database
+        userRepository.saveAndFlush(user);
     }
 }

@@ -18,4 +18,14 @@ public class UserDTO {
     private String firstName;
     private String lastName;
     private List<String> roles;
+
+    // 自定义配置字段
+    private String backgroundColor;
+    private String cardColor;
+    private String nickname;
+
+    // 新增：头像相关字段
+    private String avatarType;   // 'emoji' | 'upload' | 'default'
+    private String avatarEmoji;  // 如：'🦄'
+    private String avatarUrl;    // 如果是上传头像，则为 base64 或链接
 }
