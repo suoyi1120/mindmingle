@@ -2,6 +2,7 @@ package com.group02.mindmingle.service;
 
 import com.group02.mindmingle.dto.challenge.ChallengeProgressDto;
 import com.group02.mindmingle.dto.challenge.UserChallengeProgressDTO;
+import com.group02.mindmingle.dto.challenge.ChallengeHistoryDto;
 import com.group02.mindmingle.dto.game.GameProgressDto;
 import com.group02.mindmingle.model.ChallengeParticipation;
 
@@ -15,7 +16,7 @@ public interface IUserChallengeService {
     void joinChallenge(Long challengeId, Long userId);
 
     // 获取用户挑战历史
-    List<ChallengeParticipation> getUserChallengeHistory(Long userId);
+    List<ChallengeHistoryDto> getUserChallengeHistory(Long userId);
 
     // 获取用户的挑战进度
     ChallengeProgressDto getUserChallengeProgress(Long challengeId, Long userId);

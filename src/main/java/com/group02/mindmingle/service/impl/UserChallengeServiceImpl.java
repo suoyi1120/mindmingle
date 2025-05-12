@@ -4,6 +4,7 @@ import com.group02.mindmingle.dto.challenge.ChallengeProgressDto;
 import com.group02.mindmingle.dto.challenge.ChallengeDayDto;
 import com.group02.mindmingle.dto.challenge.UserChallengeProgressDTO;
 import com.group02.mindmingle.dto.game.GameProgressDto;
+import com.group02.mindmingle.dto.challenge.ChallengeHistoryDto;
 import com.group02.mindmingle.exception.ResourceNotFoundException;
 import com.group02.mindmingle.model.Challenge;
 import com.group02.mindmingle.model.ChallengeDay;
@@ -60,8 +61,11 @@ public class UserChallengeServiceImpl implements IUserChallengeService {
     }
 
     @Override
-    public List<ChallengeParticipation> getUserChallengeHistory(Long userId) {
-        return participationRepository.findByUser_Id(userId);
+    public List<ChallengeHistoryDto> getUserChallengeHistory(Long userId) {
+        List<ChallengeParticipation> participations = participationRepository.findByUser_Id(userId);
+        return participations.stream()
+                .map(ChallengeHistoryDto::fromChallengeParticipation)
+                .collect(Collectors.toList());
     }
 
     @Override

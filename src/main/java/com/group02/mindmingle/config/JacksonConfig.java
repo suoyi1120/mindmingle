@@ -44,6 +44,8 @@ public class JacksonConfig {
         // 禁用将日期写为时间戳
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
+        objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+
         return objectMapper;
     }
 }

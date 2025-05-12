@@ -5,6 +5,7 @@ import com.group02.mindmingle.dto.challenge.ChallengeDayDto;
 import com.group02.mindmingle.dto.challenge.ChallengeProgressDto;
 import com.group02.mindmingle.dto.challenge.UserChallengeProgressDTO;
 import com.group02.mindmingle.dto.game.GameProgressDto;
+import com.group02.mindmingle.dto.challenge.ChallengeHistoryDto;
 import com.group02.mindmingle.model.ChallengeParticipation;
 import com.group02.mindmingle.model.User;
 import com.group02.mindmingle.service.IChallengeQueryService;
@@ -54,8 +55,8 @@ public class ChallengeController {
     // }
 
     @GetMapping("/history/{userId}")
-    public List<ChallengeParticipation> getHistory(@PathVariable Long userId) {
-        return userChallengeService.getUserChallengeHistory(userId);
+    public ResponseEntity<List<ChallengeHistoryDto>> getHistory(@PathVariable Long userId) {
+        return ResponseEntity.ok(userChallengeService.getUserChallengeHistory(userId));
     }
 
     // 获取挑战的每日游戏列表
