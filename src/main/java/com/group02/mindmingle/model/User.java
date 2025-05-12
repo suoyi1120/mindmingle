@@ -39,6 +39,20 @@ public class User implements UserDetails {
 
     private String lastName;
 
+    // 用户配置相关字段
+    private String backgroundColor = "#0a0a0a"; // 默认背景颜色
+
+    private String cardColor = "rgb(24, 24, 27)"; // 默认卡片颜色
+
+    @Column(length = 10)
+    private String avatarType = "default"; // 头像类型: default, emoji, upload
+
+    @Column(length = 10)
+    private String avatarEmoji = "👤"; // 默认表情
+
+    @Column(length = 1024)
+    private String avatarUrl; // 头像URL
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
