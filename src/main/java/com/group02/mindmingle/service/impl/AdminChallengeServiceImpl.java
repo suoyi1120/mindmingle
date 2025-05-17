@@ -10,6 +10,7 @@ import com.group02.mindmingle.model.Game;
 import com.group02.mindmingle.repository.ChallengeDayRepository;
 import com.group02.mindmingle.repository.ChallengeRepository;
 import com.group02.mindmingle.repository.GameRepository;
+import com.group02.mindmingle.scheduler.ChallengeStatusScheduler;
 import com.group02.mindmingle.service.FileUploadService;
 import com.group02.mindmingle.service.IAdminChallengeService;
 
@@ -43,6 +44,9 @@ public class AdminChallengeServiceImpl implements IAdminChallengeService {
 
     @Autowired
     private ChallengeMapper challengeMapper;
+
+    @Autowired
+    private ChallengeStatusScheduler challengeStatusScheduler;
 
     @Override
     @Transactional
@@ -92,6 +96,12 @@ public class AdminChallengeServiceImpl implements IAdminChallengeService {
             savedChallenge.setChallengeDays(challengeDays);
         }
 
+        // 如果状态为已发布，则立即执行一次状态检查
+        if (savedChallenge.getStatus() == Challenge.ChallengeStatus.PUBLISHED) {
+            logger.info("挑战已发布，立即执行一次状态更新检查: {}", savedChallenge.getId());
+            challengeStatusScheduler.updateChallengeStatuses();
+        }
+
         return challengeMapper.mapToChallengeDto(savedChallenge);
     }
 
@@ -117,6 +127,10 @@ public class AdminChallengeServiceImpl implements IAdminChallengeService {
         try {
             // 保存旧的封面URL，用于后续删除
             String oldImageUrl = challenge.getImageUrl();
+
+            // 判断是否从草稿变为已发布状态
+            boolean isPublishing = challenge.getStatus() == Challenge.ChallengeStatus.DRAFT &&
+                    request.getStatus() == Challenge.ChallengeStatus.PUBLISHED;
 
             // 更新基本信息
             challenge.setTitle(request.getTitle());
@@ -186,8 +200,15 @@ public class AdminChallengeServiceImpl implements IAdminChallengeService {
                 }
             }
 
-            // 最终保存并返回
+            // 最终保存
             Challenge finalChallenge = challengeRepository.save(challenge);
+
+            // 如果从草稿变为已发布状态，立即执行一次状态检查
+            if (isPublishing) {
+                logger.info("挑战状态从DRAFT更新为PUBLISHED，立即执行一次状态更新检查: {}", finalChallenge.getId());
+                challengeStatusScheduler.updateChallengeStatuses();
+            }
+
             return challengeMapper.mapToChallengeDto(finalChallenge);
         } catch (Exception e) {
             // 记录详细错误信息

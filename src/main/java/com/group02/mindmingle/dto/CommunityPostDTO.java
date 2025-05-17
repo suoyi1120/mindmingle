@@ -2,6 +2,8 @@ package com.group02.mindmingle.dto;
 
 import lombok.Data;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 public class CommunityPostDTO {
@@ -17,4 +19,7 @@ public class CommunityPostDTO {
     private boolean isVisible;
     private int likes;
     private boolean isLike = false;
+
+    // 添加内容片段列表
+    private List<PostSegmentDTO> segments = new ArrayList<>();
 }
