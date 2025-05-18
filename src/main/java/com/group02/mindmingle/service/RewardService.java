@@ -1,17 +1,24 @@
 package com.group02.mindmingle.service;
 
 import com.group02.mindmingle.model.Reward;
+import com.group02.mindmingle.model.User;
 import com.group02.mindmingle.repository.RewardRepository;
+import com.group02.mindmingle.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class RewardService {
 
     private final RewardRepository rewardRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     public RewardService(RewardRepository rewardRepository) {
@@ -41,7 +48,7 @@ public class RewardService {
     public Reward updateReward(Long id, Reward rewardDetails) {
         return rewardRepository.findById(id)
                 .map(reward -> {
-                    reward.setChallengeId(rewardDetails.getChallengeId());
+                    reward.setChallenge(rewardDetails.getChallenge());
                     reward.setName(rewardDetails.getName());
                     reward.setDescription(rewardDetails.getDescription());
                     reward.setIconUrl(rewardDetails.getIconUrl());
@@ -56,5 +63,13 @@ public class RewardService {
 
     public boolean existsByChallengeId(Integer challengeId) {
         return rewardRepository.existsByChallengeId(challengeId);
+    }
+
+    public Set<Reward> getRewardsByCurrentUser() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User currentUser = userRepository.findByEmail(user.getEmail())
+                .orElseThrow(() -> new RuntimeException("Current user not found"));
+
+        return currentUser.getRewards();  // lazy-loaded, unless fetch = EAGER
     }
 } 

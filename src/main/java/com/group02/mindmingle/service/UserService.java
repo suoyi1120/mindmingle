@@ -1,15 +1,19 @@
 package com.group02.mindmingle.service;
 
 import com.group02.mindmingle.dto.user.UserDTO;
+import com.group02.mindmingle.model.Reward;
 import com.group02.mindmingle.dto.user.UserProfileUpdateRequest;
 import com.group02.mindmingle.exception.ResourceNotFoundException;
 import com.group02.mindmingle.model.Role;
+import com.group02.mindmingle.repository.RewardRepository;
 import com.group02.mindmingle.repository.RoleRepository;
 import com.group02.mindmingle.model.User;
 import com.group02.mindmingle.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -27,6 +31,9 @@ public class UserService implements UserDetailsService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final FileUploadService fileUploadService;
+
+    @Autowired
+    private RewardRepository rewardRepository;
 
     public UserService(UserRepository userRepository, RoleRepository roleRepository,
             @Lazy PasswordEncoder passwordEncoder, FileUploadService fileUploadService) {
@@ -106,6 +113,19 @@ public class UserService implements UserDetailsService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("用户不存在: " + email));
         return convertToDto(user);
+    }
+
+    @Transactional
+    public void addReward(long rewardId) {
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userRepository.findByEmail(currentUser.getEmail())
+                .orElseThrow(() -> new UsernameNotFoundException("用户不存在"));
+
+        Reward reward = rewardRepository.findById(rewardId)
+                .orElseThrow(() -> new RuntimeException("奖励不存在: " + rewardId));
+
+        user.getRewards().add(reward);  // 多对多关系自动建立
+        userRepository.save(user);
     }
 
     /**

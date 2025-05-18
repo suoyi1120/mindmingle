@@ -54,8 +54,10 @@ spring:
           # (例如，通过 Azure CLI 'az login' 登录, 或设置环境变量)
 
 # 自定义属性，用于指定默认操作的容器名
+
 azure:
   storage:
+    connection-string: DefaultEndpointsProtocol=https;AccountName=mindminglefile;AccountKey=YOUR_SECRET_KEY;EndpointSuffix=core.windows.net
     container-name: generated-file
 
 server:

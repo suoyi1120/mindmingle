@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
@@ -121,5 +122,11 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> adminEndpoint() {
         return ResponseEntity.ok("这是一个管理员端点，只有管理员可以访问");
+    }
+
+    @PostMapping("/user/rewards")
+    public ResponseEntity<String> addReward(@RequestParam long rewardId) {
+        userService.addReward(rewardId);
+        return ResponseEntity.ok("Reward added successfully.");
     }
 }
