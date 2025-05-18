@@ -13,6 +13,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.hibernate.annotations.CreationTimestamp;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -39,6 +41,10 @@ public class User implements UserDetails {
 
     private String lastName;
 
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
     // 用户配置相关字段
     private String backgroundColor = "#0a0a0a"; // 默认背景颜色
 
@@ -53,19 +59,9 @@ public class User implements UserDetails {
     @Column(length = 1024)
     private String avatarUrl; // 头像URL
 
-
-
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
-
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "user_reward",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "reward_id")
-    )
-    private Set<Reward> rewards = new HashSet<>();
 
     @Builder.Default
     private boolean accountNonExpired = true;

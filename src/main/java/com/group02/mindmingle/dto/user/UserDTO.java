@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -18,6 +19,7 @@ public class UserDTO {
     private String firstName;
     private String lastName;
     private List<String> roles;
+    private LocalDateTime createdAt;
 
     // 用户配置相关字段
     private String backgroundColor;
