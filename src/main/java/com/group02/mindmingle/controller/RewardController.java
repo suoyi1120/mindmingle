@@ -1,12 +1,18 @@
 package com.group02.mindmingle.controller;
 
 import com.group02.mindmingle.model.Reward;
+import com.group02.mindmingle.model.User;
 import com.group02.mindmingle.service.RewardService;
+import com.group02.mindmingle.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/rewards")
@@ -26,9 +32,20 @@ public class RewardController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Reward>> getAllRewards() {
+    public ResponseEntity<List<RewardDTO>> getAllRewards() {
         List<Reward> rewards = rewardService.getAllRewards();
-        return ResponseEntity.ok(rewards);
+        List<RewardDTO> rewardDTOS = new ArrayList<>();
+        for(Reward reward :rewards){
+            RewardDTO rewardDTO = new RewardDTO();
+            rewardDTO.id = reward.getId();
+            rewardDTO.challengeTitle = reward.getChallenge().getTitle();
+            rewardDTO.description = reward.getDescription();
+            rewardDTO.name = reward.getName();
+            rewardDTO.iconUrl = reward.getIconUrl();
+            rewardDTO.createdAt = reward.getCreatedAt();
+            rewardDTOS.add(rewardDTO);
+        }
+        return ResponseEntity.ok(rewardDTOS);
     }
 
     @GetMapping("/{id}")
@@ -67,4 +84,86 @@ public class RewardController {
     public ResponseEntity<Boolean> checkChallengeRewardExists(@PathVariable Integer challengeId) {
         return ResponseEntity.ok(rewardService.existsByChallengeId(challengeId));
     }
-} 
+
+    @GetMapping("/my-rewards")
+    public ResponseEntity<?> getRewardsByCurrentUser() {
+        try {
+            List<RewardDTO> rewardDTOS = new ArrayList<>();
+            Set<Reward> rewards = rewardService.getRewardsByCurrentUser();
+            for(Reward reward :rewards){
+                RewardDTO rewardDTO = new RewardDTO();
+                rewardDTO.id = reward.getId();
+                rewardDTO.challengeTitle = reward.getChallenge().getTitle();
+                rewardDTO.description = reward.getDescription();
+                rewardDTO.name = reward.getName();
+                rewardDTO.iconUrl = reward.getIconUrl();
+                rewardDTO.createdAt = reward.getCreatedAt();
+                rewardDTOS.add(rewardDTO);
+            }
+            return ResponseEntity.ok(rewardDTOS);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+        }
+    }
+
+    public static class RewardDTO implements Serializable {
+        private Long id;
+        private String name;
+        private String description;
+        private String iconUrl;
+        private String challengeTitle;
+
+        private LocalDateTime createdAt;
+
+        public RewardDTO() {}
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
+
+        public String getIconUrl() {
+            return iconUrl;
+        }
+
+        public void setIconUrl(String iconUrl) {
+            this.iconUrl = iconUrl;
+        }
+
+        public String getChallengeTitle() {
+            return challengeTitle;
+        }
+
+        public void setChallengeTitle(String challengeTitle) {
+            this.challengeTitle = challengeTitle;
+        }
+
+        public LocalDateTime getCreatedAt() {
+            return createdAt;
+        }
+
+        public void setCreatedAt(LocalDateTime createdAt) {
+            this.createdAt = createdAt;
+        }
+
+        public Long getId() {
+            return id;
+        }
+
+        public void setId(Long id) {
+            this.id = id;
+        }
+    }
+}
+

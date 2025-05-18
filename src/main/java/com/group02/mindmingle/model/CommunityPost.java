@@ -2,10 +2,11 @@ package com.group02.mindmingle.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
-
 
 @Entity
 @Data
@@ -41,5 +42,19 @@ public class CommunityPost {
 
     private int likes = 0;
 
-    // Constructors, Getters and Setters omitted for brevity (same as above)
+    // 添加与PostSegment的一对多关系
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("orderIndex ASC")
+    private List<PostSegment> segments = new ArrayList<>();
+
+    // 添加帮助方法以管理双向关系
+    public void addSegment(PostSegment segment) {
+        segments.add(segment);
+        segment.setPost(this);
+    }
+
+    public void removeSegment(PostSegment segment) {
+        segments.remove(segment);
+        segment.setPost(null);
+    }
 }

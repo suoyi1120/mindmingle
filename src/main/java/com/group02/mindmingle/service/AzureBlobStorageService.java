@@ -47,7 +47,7 @@ public class AzureBlobStorageService {
             logger.error("Error initializing container client for container '{}': {}", containerName, e.getMessage(),
                     e);
             // 根据需要处理异常，例如抛出自定义异常
-            throw new RuntimeException("Could not initialize container client", e);
+           // throw new RuntimeException("Could not initialize container client", e);
         }
     }
 
