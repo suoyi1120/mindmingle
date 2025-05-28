@@ -125,7 +125,7 @@ public class UserController {
     }
 
     @PostMapping("/user/rewards")
-    public ResponseEntity<String> addReward(@RequestParam long rewardId) {
+    public ResponseEntity<String> addReward(@RequestParam int rewardId) {
         userService.addReward(rewardId);
         return ResponseEntity.ok("Reward added successfully.");
     }

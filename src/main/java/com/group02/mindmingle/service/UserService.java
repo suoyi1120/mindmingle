@@ -116,15 +116,15 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public void addReward(long rewardId) {
+    public void addReward(int challengeId) {
         User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = userRepository.findByEmail(currentUser.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("用户不存在"));
 
-        Reward reward = rewardRepository.findById(rewardId)
-                .orElseThrow(() -> new RuntimeException("奖励不存在: " + rewardId));
-
-        user.getRewards().add(reward);  // 多对多关系自动建立
+        List<Reward> rewards = rewardRepository.findByChallengeId(challengeId);
+        if(!rewards.isEmpty()){
+            user.getRewards().add(rewards.get(0));  // 多对多关系自动建立
+        }
         userRepository.save(user);
     }
 

@@ -14,6 +14,7 @@ import com.group02.mindmingle.repository.ChallengeRepository;
 import com.group02.mindmingle.repository.UserRepository;
 import com.group02.mindmingle.service.IUserChallengeService;
 
+import com.group02.mindmingle.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +36,9 @@ public class UserChallengeServiceImpl implements IUserChallengeService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private ChallengeQueryServiceImpl challengeQueryService;
@@ -155,6 +159,7 @@ public class UserChallengeServiceImpl implements IUserChallengeService {
         if (completedDays.size() >= participation.getChallenge().getDuration()) {
             participation.setStatus(ChallengeParticipation.Status.COMPLETED);
             participation.setEndDate(LocalDateTime.now());
+            userService.addReward(Math.toIntExact(participation.getChallenge().getId()));
         }
 
         participationRepository.save(participation);
