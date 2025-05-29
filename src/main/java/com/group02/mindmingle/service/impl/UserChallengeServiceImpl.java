@@ -234,7 +234,7 @@ public class UserChallengeServiceImpl implements IUserChallengeService {
                 }
             } catch (Exception e) {
                 // 如果发生异常，设置一个默认值
-                currentGameTitle = "今日游戏加载中...";
+                currentGameTitle = "loading...";
             }
 
             return UserChallengeProgressDTO.builder()
